@@ -1,55 +1,81 @@
 <?php
 
+/**
+ * Created by Reliese Model.
+ */
+
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
-use Laravel\Sanctum\HasApiTokens;
+use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
 
-class User extends Authenticatable
+/**
+ * Class User
+ * 
+ * @property int $user_id
+ * @property int $login_id
+ * @property string $name
+ * @property string|null $second_name
+ * @property string|null $last_name
+ * @property string|null $second_last_name
+ * @property int|null $role_id
+ * @property Carbon|null $registration_date
+ * 
+ * @property Login $login
+ * @property Collection|Ticket[] $tickets
+ * @property Collection|Order[] $orders
+ * @property Collection|Review[] $reviews
+ * @property Collection|Role[] $roles
+ *
+ * @package App\Models
+ */
+class User extends Model
 {
-    use HasApiTokens, HasFactory, Notifiable;
+	protected $table = 'user';
+	protected $primaryKey = 'user_id';
+	public $incrementing = false;
+	public $timestamps = false;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
-    protected $fillable = [
-        'name',
-        'email',
-        'password',
-    ];
+	protected $casts = [
+		'user_id' => 'int',
+		'login_id' => 'int',
+		'role_id' => 'int',
+		'registration_date' => 'datetime'
+	];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var array<int, string>
-     */
-    protected $hidden = [
-        'password',
-        'remember_token',
-    ];
+	protected $fillable = [
+		'login_id',
+		'name',
+		'second_name',
+		'last_name',
+		'second_last_name',
+		'role_id',
+		'registration_date'
+	];
 
-    /**
-     * The attributes that should be cast.
-     *
-     * @var array<string, string>
-     */
-    protected $casts = [
-        'email_verified_at' => 'datetime',
-        'password' => 'hashed',
-    ];
+	public function login()
+	{
+		return $this->belongsTo(Login::class, 'user_id');
+	}
 
-    public function roles()
-    {
-        return $this->belongsToMany(Role::class);
-    }
+	public function tickets()
+	{
+		return $this->belongsToMany(Ticket::class, 'assigned_user_ticket');
+	}
 
-    public function hasRole($roleName)
-    {
-        return $this->roles()->where('name', $roleName)->exists();
-    }
+	public function orders()
+	{
+		return $this->hasMany(Order::class);
+	}
+
+	public function reviews()
+	{
+		return $this->hasMany(Review::class);
+	}
+
+	public function roles()
+	{
+		return $this->belongsToMany(Role::class);
+	}
 }
