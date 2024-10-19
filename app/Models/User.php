@@ -52,4 +52,10 @@ class User extends Authenticatable
     {
         return $this->roles()->where('name', $roleName)->exists();
     }
+    
+    public function reviews()
+    {
+        return $this->hasMany(Review::class);
+    }
+
 }
