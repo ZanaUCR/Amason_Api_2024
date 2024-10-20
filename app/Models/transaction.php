@@ -17,8 +17,8 @@ class transaction extends Model
     
         // Definir la relación con Order (si también tienes un modelo Order)
       
-        public function paymentMethod()
+        public function transactionOrder()
         {
-            return $this->belongsTo(PaymentMethod::class, 'payment_method_id', 'id');
+           return $this->hasOne(Order::class, 'transaction_id', 'transaction_id');
         }
 }
