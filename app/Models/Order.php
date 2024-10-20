@@ -17,6 +17,13 @@ class Order extends Model
 
     }
 
+    public function orderTransactions()
+    {
+        return $this->belongsTo(Transaction::class, 'transaction_id', 'transaction_id');
+
+    }
+
+
     
   
 }

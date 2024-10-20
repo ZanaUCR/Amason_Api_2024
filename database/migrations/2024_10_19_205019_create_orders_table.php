@@ -14,7 +14,8 @@ return new class extends Migration
         Schema::create('orders', function (Blueprint $table) {
             $table->id('order_id'); // Auto-incremental
             $table->foreignId('user_id')->constrained()->onDelete('cascade'); // Relación con la tabla de usuarios
-        
+            $table->unsignedBigInteger('transaction_id'); // Columna para la relación con órdenes
+            $table->foreign('transaction_id')->references('transaction_id')->on('transactions')->onDelete('cascade');
             $table->double('total_amount'); // Monto total
             $table->integer('status'); // Estado de la orden
             $table->timestamps(); // Campos created_at y updated_at
