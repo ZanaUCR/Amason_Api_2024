@@ -10,15 +10,17 @@ class transaction extends Model
     use HasFactory;
 
         // Definir la relación con PaymentMethod
-        public function paymentMethod()
-        {
-            return $this->belongsTo(PaymentMethod::class, 'payment_method_id', 'id');
-        }
+      
     
         // Definir la relación con Order (si también tienes un modelo Order)
       
         public function transactionOrder()
         {
            return $this->hasOne(Order::class, 'transaction_id', 'transaction_id');
+        }
+     
+        public function paymentMethod()
+        {
+            return $this->belongsTo(payment_method::class, 'payment_method_id', 'id');
         }
 }
