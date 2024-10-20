@@ -13,8 +13,7 @@ return new class extends Migration
     {
         Schema::create('transactions', function (Blueprint $table) {
             $table->id('transaction_id'); // Definimos el ID de la transacción
-            $table->unsignedBigInteger('order_id'); // Columna para la relación con órdenes
-            $table->foreign('order_id')->references('order_id')->on('orders')->onDelete('cascade'); // Relación con la tabla de órdenes
+
             $table->foreignId('payment_method_id')->constrained()->onDelete('cascade'); // Relación con la tabla de métodos de pago
             $table->date('purchase_date'); // Fecha de compra
             $table->timestamps(); // Campos created_at y updated_at
