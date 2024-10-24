@@ -31,6 +31,7 @@ Route::post('/cart/add', [CartProductsController::class, 'addtocart'])->name('ca
 Route::get('/cart/{userId}', [CartProductsController::class, 'index'])->name('cart.index');
 Route::post('/cart/remove', [CartProductsController::class, 'removeProductUnits'])->name('cart.remove');
 Route::post('/cart/remove-product', [CartProductsController::class, 'removeProductFromCart'])->name('cart.remove.product');
+Route::post('/cart/removeall', [CartProductsController::class, 'removeAllProductsFromCart'])->name('cart.removeAll.product');
 
 
 

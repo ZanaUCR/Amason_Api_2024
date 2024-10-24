@@ -137,6 +137,25 @@ class CartProductsController extends Controller
         }
     }
 
+    //todo    Metodo para remover un producto del carrito 
+    public function removeAllProductsFromCart()
+    {
+        try {
+            //* Buscar el producto en el carrito 
+            //  $productincart = cart_products::where('user_id', auth()->user()->id)->where('product_id', $idproducttoremove)->firstOrFail();
+            $productincart = cart_products::where('user_id', 1)->get();
+
+            foreach ($productincart as $product) {
+                $product->delete();
+            }
+            return response()->json(['message' => 'El producto se ha eliminado del carrito.'], 200);
+        } catch (\Exception $e) {
+
+            //! mensaje de error
+            return response()->json(['error' => 'Ocurrió un error al intentar actualizar el carrito.'], 500);
+        }
+    }
+
 
     public function create()
     {
