@@ -21,6 +21,6 @@ Route::get('/', function () {
 require __DIR__.'/auth.php';
 
 
-Route::get('/cart/view', [CartProductsController::class, 'index'])->name('cartproducts.index');
+//Route::get('/cart/view', [CartProductsController::class, 'index'])->name('cartproducts.index');
 //Route::post('/cart/add', [CartProductsController::class, 'addtocart'])->name('cart.add');
-Route::delete('/cart/remove', [CartProductsController::class, 'removeFromCart'])->name('cart.remove');
+//Route::post('/cart/remove', [CartProductsController::class, 'removeFromCart'])->name('cart.remove');

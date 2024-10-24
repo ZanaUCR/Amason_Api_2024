@@ -1,8 +1,10 @@
 <?php
 
+//use Illuminate\Http\Response;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CartProductsController;
 
 /*
 |--------------------------------------------------------------------------
@@ -24,3 +26,11 @@ Route::get('/', function () {
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::middleware('auth:sanctum')->post('/logout', [AuthController::class, 'logout']);
+Route::post('/cart/add', [CartProductsController::class, 'addtocart'])->name('cart.add');
+
+Route::get('/cart/{userId}', [CartProductsController::class, 'index'])->name('cart.index');
+Route::post('/cart/remove', [CartProductsController::class, 'removeProductUnits'])->name('cart.remove');
+Route::post('/cart/remove-product', [CartProductsController::class, 'removeProductFromCart'])->name('cart.remove.product');
+
+
+
