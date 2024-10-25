@@ -15,7 +15,15 @@ class cart_products extends Model
  
     protected $fillable = ['quantity', 'user_id', 'product_id'];
 
-   
+    public function __construct(array $attributes = [])
+    {
+        parent::__construct($attributes);
+
+        
+        if (empty($this->user_id)) {
+            $this->user_id = auth()->user()->id ?? null; 
+        }
+    }
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id', 'id');

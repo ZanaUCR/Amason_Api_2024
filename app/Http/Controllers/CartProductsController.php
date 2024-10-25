@@ -30,6 +30,7 @@ class CartProductsController extends Controller
     }
 
 
+
     //todo    Metodo para agregar al carrito, se recibe un objeto cart_products, con quantity y product_id definidos, el user_id se obtiene de la session
     public function addtocart(Request $request)
     {
@@ -38,12 +39,10 @@ class CartProductsController extends Controller
         try {
             //*validar que exista el producto en el carrito
             //$productincart = cart_products::where('user_id', auth()->user()->id)->where('product_id', $idproducttoadd)->first();
-            $productincart = cart_products::where('user_id', 1)->where('product_id', $idproducttoadd)->first();
-
-
+            $productincart = $this->searchProductInCart($idproducttoadd);
 
             //*validar que haya stock del producto
-            $product = Product::findOrFail($idproducttoadd);
+            $product = $this->searchProduct($idproducttoadd);
             $quantity = $quantitytoadd;
 
             //* se verifica si hay mas stock del que se agrega
@@ -60,12 +59,15 @@ class CartProductsController extends Controller
                 } else {
 
                     //* se agrega el producto
-                    $newproductincart = new cart_products();
+                    //  $newproductincart = new cart_products();
                     //? $newproductincart->user_id = auth()->user()->id;
-                    $newproductincart->user_id = 1;
-                    $newproductincart->product_id = $idproducttoadd;
-                    $newproductincart->quantity = $quantitytoadd;
-                    $newproductincart->save();
+                    // $newproductincart->user_id = 1;
+                    //  $newproductincart->product_id = $idproducttoadd;
+                    //  $newproductincart->quantity = $quantitytoadd;
+
+                    $this->addProductToCart($idproducttoadd, $quantitytoadd);
+                    return response()->json(['message' => 'El producto se ha agregado al carrito.'], 201);
+
                 }
                 //* mensaje caso exitoso
                 return response()->json(['message' => 'Cantidad actualizada en el carrito.'], 200);
@@ -75,12 +77,44 @@ class CartProductsController extends Controller
                 return response()->json(['error' => 'No hay suficiente stock disponible.'], 400);
             }
             //* mensaje caso exitoso
-            return response()->json(['message' => 'El producto se ha agregado al carrito.'], 201);
+
         } catch (\Exception $e) {
             //! mensaje de error
             return response()->json(['error' => 'Ocurrió un error al agregar el producto al carrito: ' . $e->getMessage()], 500);
         }
     }
+    public function searchProductInCart($idproducttoadd)
+    {
+        $productincart = cart_products::where('user_id', 1)->where('product_id', $idproducttoadd)->first();
+        //$productincart = cart_products::where('user_id', auth()->user()->id)->where('product_id', $idproducttoadd)->first();
+        return $productincart;
+    }
+    public function searchProductInCartByuser_id()
+    {
+        $productincart = cart_products::where('user_id', 1)->get();
+        //$productincart = cart_products::where('user_id', auth()->user()->id)->where('product_id', $idproducttoadd)->first();
+        return $productincart;
+    }
+
+    public function searchProduct($idproducttoadd)
+    {
+        $product = Product::findOrFail($idproducttoadd);
+        return $product;
+    }
+
+    public function addProductToCart($idproducttoadd, $quantitytoadd)
+    {
+        $newproductincart = new cart_products([
+            // 'user_id' =>  auth()->user()->id, // Asignar el ID del usuario autenticado
+            'user_id' => 1,
+            'product_id' => $idproducttoadd,
+            'quantity' => $quantitytoadd,
+        ]);
+
+        $newproductincart->save();
+
+    }
+
 
     //todo    Metodo para remover un producto del carrito 
     public function removeProductUnits(Request $request)
@@ -90,7 +124,8 @@ class CartProductsController extends Controller
             $quantitytoremove = $request->input('quantitytoremove');
             //* Buscar el producto en el carrito 
             //  $productincart = cart_products::where('user_id', auth()->user()->id)->where('product_id', $idproducttoremove)->firstOrFail();
-            $productincart = cart_products::where('user_id', 1)->where('product_id', $idproducttoremove)->firstOrFail();
+            $productincart = $this->searchProductInCart($idproducttoremove);
+
             //* Verificar que la cantidad en el carrito sea suficiente para restar
             if ($productincart->quantity >= $quantitytoremove) {
 
@@ -126,7 +161,7 @@ class CartProductsController extends Controller
             $idproducttoremove = $request->input('idproducttoremove');
             //* Buscar el producto en el carrito 
             //  $productincart = cart_products::where('user_id', auth()->user()->id)->where('product_id', $idproducttoremove)->firstOrFail();
-            $productincart = cart_products::where('user_id', 1)->where('product_id', $idproducttoremove)->firstOrFail();
+            $productincart = $this->searchProductInCart($idproducttoremove);
 
             $productincart->delete();
             return response()->json(['message' => 'El producto se ha eliminado del carrito.'], 200);
@@ -143,7 +178,7 @@ class CartProductsController extends Controller
         try {
             //* Buscar el producto en el carrito 
             //  $productincart = cart_products::where('user_id', auth()->user()->id)->where('product_id', $idproducttoremove)->firstOrFail();
-            $productincart = cart_products::where('user_id', 1)->get();
+            $productincart = $this->searchProductInCartByuser_id();
 
             foreach ($productincart as $product) {
                 $product->delete();
