@@ -40,7 +40,6 @@ class StockController extends Controller
         }
     }
 
-
     public function increaseProductQuantity(Request $request)
     {
         $productId = $request->input('product_id');
