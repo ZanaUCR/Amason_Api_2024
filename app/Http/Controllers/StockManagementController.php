@@ -32,7 +32,6 @@ class StockController extends Controller
             $productInCart->quantity = $newQuantity;
             $productInCart->save();
 
-
             return response()->json(['message' => 'Cantidad actualizada en el carrito con éxito.'], 200);
         } catch (\Exception $e) {
 
