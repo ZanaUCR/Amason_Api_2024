@@ -9,6 +9,12 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
 
+use App\Models\Role;
+use App\Models\Review;
+use App\Models\Order;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+
+
 class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
@@ -57,6 +63,12 @@ class User extends Authenticatable
     public function reviews()
     {
         return $this->hasMany(Review::class);
+    }
+
+    // Relación con el modelo Order
+    public function orders(): HasMany
+    {
+        return $this->hasMany(Order::class);
     }
 
 }

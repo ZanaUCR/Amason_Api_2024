@@ -4,7 +4,11 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+
 use App\Http\Controllers\CartProductsController;
+
+use App\Http\Controllers\RecommendationController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -26,6 +30,7 @@ Route::get('/', function () {
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::middleware('auth:sanctum')->post('/logout', [AuthController::class, 'logout']);
+
 Route::post('/cart/add', [CartProductsController::class, 'addtocart'])->name('cart.add');
 
 Route::get('/cart/{userId}', [CartProductsController::class, 'index'])->name('cart.index');
@@ -34,4 +39,12 @@ Route::post('/cart/remove-product', [CartProductsController::class, 'removeProdu
 Route::post('/cart/removeall', [CartProductsController::class, 'removeAllProductsFromCart'])->name('cart.removeAll.product');
 
 
+
+
+
+
+Route::middleware(['auth:sanctum'])->get('/products/category/{categoryId}', [RecomendationController::class, 'getCombinedProductsInCategory']);
+
+
+Route::get('/recommendations', [RecommendationController::class, 'getRecommendations']);
 
