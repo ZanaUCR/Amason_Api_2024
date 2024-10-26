@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\RecommendationController;
 
 /*
 |--------------------------------------------------------------------------
@@ -24,3 +25,9 @@ Route::get('/', function () {
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::middleware('auth:sanctum')->post('/logout', [AuthController::class, 'logout']);
+
+
+Route::middleware(['auth:sanctum'])->get('/products/category/{categoryId}', [RecomendationController::class, 'getCombinedProductsInCategory']);
+
+
+Route::get('/recommendations', [RecommendationController::class, 'getRecommendations']);
