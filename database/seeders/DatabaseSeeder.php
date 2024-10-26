@@ -21,10 +21,13 @@ class DatabaseSeeder extends Seeder
         // 1. Crear las categorías
         $categories = Category::factory(5)->create(); // 5 categorías
 
-        // 2. Crear productos, asignando una categoría a cada producto
+        // Crear 20 productos, asignando una categoría aleatoria diferente a cada producto
         $products = Product::factory(20)->create([
-            'category_id' => $categories->random()->id, // Asignar categoría aleatoria
+            'category_id' => function () use ($categories) {
+                return $categories->random()->id; // Asignar categoría aleatoria
+            }
         ]);
+        
 
         // 3. Crear métodos de pago
         $paymentMethods = PaymentMethod::factory(3)->create(); // 3 métodos de pago
