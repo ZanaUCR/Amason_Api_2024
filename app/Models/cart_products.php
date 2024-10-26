@@ -13,7 +13,8 @@ class cart_products extends Model
     protected $table = 'cart_products';
 
  
-    protected $fillable = ['quantity', 'user_id', 'product_id'];
+    protected $fillable = ['quantity', 'user_id', 'product_id', 'description'];
+
 
     public function __construct(array $attributes = [])
     {

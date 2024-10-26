@@ -15,17 +15,21 @@ class CartProductsController extends Controller
         $totalamount = 0;
 
         // Agregando productos con detalles como nombre y precio
+        $quantityofproductsincart = count($listcartproducts);
         foreach ($listcartproducts as $cartproduct) {
             $product = Product::find($cartproduct->product_id);
             $cartproduct->product_name = $product->name;
             $cartproduct->product_price = $product->price;
+            $cartproduct->product_description = $product->description;
             $totalamount += $product->price * $cartproduct->quantity;
+
         }
 
 
         return response()->json([
             'cart_products' => $listcartproducts,
-            'total_amount' => $totalamount
+            'total_amount' => $totalamount,
+            'quantityofproductsincart' => $quantityofproductsincart
         ]);
     }
 
