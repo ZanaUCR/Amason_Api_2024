@@ -45,4 +45,19 @@ class StockController extends Controller
         $quantityIncrease = $request->input('quantity_change');
         return $this->updateCartProductQuantity($productId, $quantityIncrease);
     }
+
+    public function decreaseProductQuantity(Request $request)
+    {
+        $productId = $request->input('product_id');
+        $quantityDecrease = -1 * $request->input('quantity_change');
+
+        return $this->updateCartProductQuantity($productId, $quantityDecrease);
+    }
+
+    private function findProductInCart($productId)
+    {
+        return CartProduct::where('user_id', 1)->where('product_id', $productId)->first();
+    }
+
+
 }
