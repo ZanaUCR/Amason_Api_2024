@@ -15,6 +15,17 @@ use App\Models\PaymentMethod;
 
 class RecomendationController extends Controller
 {
+
+
+     //Basado en carrito
+     public function getRecommendations(Request $request)
+     {
+         return response()->json(['message' => 'API funcionando correctamente']);
+     }
+
+
+
+
     public function getProductsByCategory($categoryId)
     {
         $userId = Auth::id(); // Obtiene el ID del usuario autenticado
