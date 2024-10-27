@@ -12,18 +12,31 @@ use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Category;
 use App\Models\PaymentMethod;
+use App\Models\CartProducts;
 
 class RecommendationController extends Controller
 {
 
 
-     //Basado en carrito
-     public function getRecommendations(Request $request)
-     {
-         return response()->json(['message' => 'API funcionando correctamente']);
-     }
+     public function getRecommendationByCart(Request $request)
+    {
+        $userId = $request->user()->id; // Obtén el ID del usuario autenticado
 
+        // Obtener los productos en el carrito del usuario actual
+        $productosCarrito = CartProducts::where('user_id', $userId)->pluck('product_id');
 
+        // Obtener las categorías de los productos en el carrito
+        $categorias = Product::whereIn('product_id', $productosCarrito)->pluck('category_id')->unique();
+
+        // Sugerir productos que coincidan con esas categorías y que no estén en el carrito
+        $productosRecomendados = Product::whereIn('category_id', $categorias)
+                                        ->whereNotIn('product_id', $productosCarrito)
+                                        ->get();
+
+        return response()->json([
+            'recomendaciones' => $productosRecomendados
+        ], 200);
+    }
 
 
     public function getProductsByCategory($categoryId)
