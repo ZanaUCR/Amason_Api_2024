@@ -13,7 +13,7 @@ use App\Models\OrderItem;
 use App\Models\Category;
 use App\Models\PaymentMethod;
 
-class RecomendationController extends Controller
+class RecommendationController extends Controller
 {
 
 
