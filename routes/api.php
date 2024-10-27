@@ -37,7 +37,7 @@ Route::get('/cart/{userId}', [CartProductsController::class, 'index'])->name('ca
 Route::post('/cart/remove', [CartProductsController::class, 'removeProductUnits'])->name('cart.remove');
 Route::post('/cart/remove-product', [CartProductsController::class, 'removeProductFromCart'])->name('cart.remove.product');
 Route::post('/cart/removeall', [CartProductsController::class, 'removeAllProductsFromCart'])->name('cart.removeAll.product');
-
+Route::get('stores/{storeId}/top-selling-products', [ReportController::class, 'getTopSellingProductsByStore']);
 
 
 
