@@ -39,7 +39,7 @@ class CartProductsController extends Controller
             'quantity' => $request->input('quantity'),
         ]);
     
-        // Verificar la acción y llamar al método adecuado pasando el requesto
+        // Verificar la acción y llamar al método adecuado pasando el request
         if ($request->input('action') === 'add') {
             $this->addToCart($data);
         } elseif ($request->input('action') === 'remove') {
