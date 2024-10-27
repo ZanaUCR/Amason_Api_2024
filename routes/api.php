@@ -42,9 +42,8 @@ Route::middleware(['auth:sanctum', 'role:customer'])->group(function () {
     Route::get('/tickets/{id}', [TicketController::class, 'show']);
 });
 
-Route::post('/cart/add', [CartProductsController::class, 'addtocart'])->name('cart.add');
 
-Route::get('/cart/{userId}', [CartProductsController::class, 'index'])->name('cart.index');
+
 
 Route::post('/cart/remove', [CartProductsController::class, 'removeProductUnits'])->name('cart.remove');
 Route::post('/cart/remove-product', [CartProductsController::class, 'removeProductFromCart'])->name('cart.remove.product');

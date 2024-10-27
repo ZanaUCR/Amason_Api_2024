@@ -94,25 +94,29 @@ class CartProductsController extends Controller
     }
     public function searchProductInCart($idproducttoadd)
     {
-        $productincart = cart_products::where('user_id', auth()->user()->id)->where('product_id', $idproducttoadd)->first();
+       // $productincart = cart_products::where('user_id', auth()->user()->id)->where('product_id', $idproducttoadd)->first();
+        $productincart = cart_products::where('user_id', 1)->where('product_id', $idproducttoadd)->first();
         return $productincart;
     }
     public function searchProductInCartByuser_id()
     {
-        $productincart = cart_products::where('user_id', auth()->user()->id)->get();
+       // $productincart = cart_products::where('user_id', auth()->user()->id)->get();
+        $productincart = cart_products::where('user_id', 1)->get();
         return $productincart;
     }
 
     public function searchProductsStock($idproducttoadd)
     {
-        $product = Product::findOrFail($idproducttoadd);
+        $product = Product::where('product_id', $idproducttoadd)->firstOrFail();
+
         return $product->stock;
     }
 
     public function addProductToCart($idproducttoadd, $quantitytoadd)
     {
         $newproductincart = new cart_products([
-             'user_id' =>  auth()->user()->id, 
+           //  'user_id' =>  auth()->user()->id, 
+           'user_id' =>  1, 
             'product_id' => $idproducttoadd,
             'quantity' => $quantitytoadd,
         ]);
