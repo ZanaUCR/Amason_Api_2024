@@ -33,13 +33,13 @@ class CartProductsController extends Controller
 
     public function updateUnits(Request $request)
     {
-        // Compactar los datos en un solo Request
+        // Compactar los datos en un solo Requesto
         $data = new Request([
             'idproduct' => $request->input('idproducttoupdate'),
             'quantity' => $request->input('quantity'),
         ]);
     
-        // Verificar la acción y llamar al método adecuado pasando el request
+        // Verificar la acción y llamar al método adecuado pasando el requesto
         if ($request->input('action') === 'add') {
             $this->addToCart($data);
         } elseif ($request->input('action') === 'remove') {
