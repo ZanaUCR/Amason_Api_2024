@@ -36,10 +36,11 @@ Route::post('/cart/add', [CartProductsController::class, 'addToCart'])->name('ca
 
 Route::get('/cart/{userId}', [CartProductsController::class, 'showCart'])->name('cart.showCart');
 
-Route::post('/tickets/store', [TicketController::class, 'store']);
-Route::get('/tickets', [TicketController::class, 'index']);
-Route::get('/tickets/{id}', [TicketController::class, 'show']);
-
+Route::middleware(['auth:sanctum', 'role:customer'])->group(function () {
+    Route::resource('tickets', TicketController::class);
+    Route::get('/tickets', [TicketController::class, 'index']);
+    Route::get('/tickets/{id}', [TicketController::class, 'show']);
+});
 
 Route::post('/cart/add', [CartProductsController::class, 'addtocart'])->name('cart.add');
 

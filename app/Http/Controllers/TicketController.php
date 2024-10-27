@@ -33,6 +33,7 @@ class TicketController extends Controller
             'description' => $request->description,
             'file' => $filePath, // Store the file path in the database
             'notify_by' => $request->notify_by,
+            'user_id' => auth()->id()
         ]);
 
         return response()->json($ticket, 201);
@@ -48,7 +49,7 @@ class TicketController extends Controller
     // Show a specific ticket
     public function show($id)
     {
-        $ticket = Ticket::find($id);
+         $ticket = Ticket::where('id', $id)->where('user_id', auth()->id())->first();
 
         if ($ticket) {
             // Generate a full URL for the file if it exists

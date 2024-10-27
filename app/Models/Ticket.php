@@ -17,4 +17,10 @@ class Ticket extends Model
         'file',
         'notify_by'
     ];
+
+    public function user()
+{
+    return $this->belongsTo(User::class);
+}
+
 }
