@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('payment_methods', function (Blueprint $table) {
+        Schema::create('payment_method', function (Blueprint $table) {
             $table->id(); // Auto-incremental
             $table->string('payment_method'); // Método de pago
             $table->timestamps(); // Campos created_at y updated_at
@@ -23,6 +23,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('payment_methods');
+        Schema::dropIfExists('payment_method');
     }
 };

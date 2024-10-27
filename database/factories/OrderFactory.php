@@ -17,7 +17,10 @@ class OrderFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            "user_id" => \App\Models\User::factory(),
+            "payment_method_id" => \App\Models\PaymentMethod::factory(),
+            "total_amount" => $this->faker->randomFloat(2, 0, 9999),
+            "status" => $this->faker->numberBetween(0, 1),
         ];
     }
 }
