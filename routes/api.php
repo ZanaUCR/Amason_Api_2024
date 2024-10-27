@@ -4,6 +4,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\TicketController;
 
 use App\Http\Controllers\CartProductsController;
 
@@ -32,7 +33,18 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::middleware('auth:sanctum')->post('/logout', [AuthController::class, 'logout']);
 Route::post('/cart/add', [CartProductsController::class, 'addToCart'])->name('cart.addToCart');
 
+
 Route::get('/cart/{userId}', [CartProductsController::class, 'showCart'])->name('cart.showCart');
+
+Route::post('/tickets/store', [TicketController::class, 'store']);
+Route::get('/tickets', [TicketController::class, 'index']);
+Route::get('/tickets/{id}', [TicketController::class, 'show']);
+
+
+Route::post('/cart/add', [CartProductsController::class, 'addtocart'])->name('cart.add');
+
+Route::get('/cart/{userId}', [CartProductsController::class, 'index'])->name('cart.index');
+
 Route::post('/cart/remove', [CartProductsController::class, 'removeProductUnits'])->name('cart.remove');
 Route::post('/cart/remove-product', [CartProductsController::class, 'removeProductFromCart'])->name('cart.remove.product');
 Route::post('/cart/removeall', [CartProductsController::class, 'removeAllProductsFromCart'])->name('cart.removeAll.product');
@@ -46,4 +58,5 @@ Route::middleware(['auth:sanctum'])->get('/products/category/{categoryId}', [Rec
 
 
 Route::get('/recommendations', [RecommendationController::class, 'getRecommendations']);
+
 
