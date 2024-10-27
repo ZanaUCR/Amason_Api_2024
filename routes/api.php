@@ -4,6 +4,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\TicketController;
 
 use App\Http\Controllers\CartProductsController;
 
@@ -31,6 +32,11 @@ Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::middleware('auth:sanctum')->post('/logout', [AuthController::class, 'logout']);
 
+Route::post('/tickets/store', [TicketController::class, 'store']);
+Route::get('/tickets', [TicketController::class, 'index']);
+Route::get('/tickets/{id}', [TicketController::class, 'show']);
+
+
 Route::post('/cart/add', [CartProductsController::class, 'addtocart'])->name('cart.add');
 
 Route::get('/cart/{userId}', [CartProductsController::class, 'index'])->name('cart.index');
@@ -47,4 +53,5 @@ Route::middleware(['auth:sanctum'])->get('/products/category/{categoryId}', [Rec
 
 
 Route::get('/recommendations', [RecommendationController::class, 'getRecommendations']);
+
 
