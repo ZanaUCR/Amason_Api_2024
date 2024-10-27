@@ -26,9 +26,9 @@ Route::get('/', function () {
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::middleware('auth:sanctum')->post('/logout', [AuthController::class, 'logout']);
-Route::post('/cart/add', [CartProductsController::class, 'addtocart'])->name('cart.add');
+Route::post('/cart/add', [CartProductsController::class, 'addToCart'])->name('cart.addToCart');
 
-Route::get('/cart/{userId}', [CartProductsController::class, 'index'])->name('cart.index');
+Route::get('/cart/{userId}', [CartProductsController::class, 'showCart'])->name('cart.showCart');
 Route::post('/cart/remove', [CartProductsController::class, 'removeProductUnits'])->name('cart.remove');
 Route::post('/cart/remove-product', [CartProductsController::class, 'removeProductFromCart'])->name('cart.remove.product');
 Route::post('/cart/removeall', [CartProductsController::class, 'removeAllProductsFromCart'])->name('cart.removeAll.product');
