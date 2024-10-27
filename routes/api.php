@@ -32,10 +32,11 @@ Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::middleware('auth:sanctum')->post('/logout', [AuthController::class, 'logout']);
 
-Route::post('/tickets/store', [TicketController::class, 'store']);
-Route::get('/tickets', [TicketController::class, 'index']);
-Route::get('/tickets/{id}', [TicketController::class, 'show']);
-
+Route::middleware(['auth:sanctum', 'role:customer'])->group(function () {
+    Route::resource('tickets', TicketController::class);
+    Route::get('/tickets', [TicketController::class, 'index']);
+    Route::get('/tickets/{id}', [TicketController::class, 'show']);
+});
 
 Route::post('/cart/add', [CartProductsController::class, 'addtocart'])->name('cart.add');
 
