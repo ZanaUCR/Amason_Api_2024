@@ -11,21 +11,21 @@ use Illuminate\Support\Facades\Validator;
 class ProductController extends Controller
 {
     // Obtener productos por tienda
-    public function getProductsByStore($storeId)
-    {
-        $products = Product::where('id_store', $storeId)
-            ->with('images')
-            ->select('name', 'price')
-            ->get();
+public function getProductsByStore($storeId)
+{
+    $products = Product::where('id_store', $storeId)
+        ->with('images')
+        ->select('id', 'name', 'price') // Añadir 'id' a la selección
+        ->get();
 
-        // Asignar la primera imagen o una imagen por defecto
-        $products->each(function ($product) {
-            $product->image = $product->images->first()->image_path ?? 'default_image_path';
-            unset($product->images);  // Remover las imágenes del resultado
-        });
+    // Asignar la primera imagen o una imagen por defecto
+    $products->each(function ($product) {
+        $product->image = $product->images->first()->image_path ?? 'default_image_path';
+        unset($product->images);  // Remover las imágenes del resultado
+    });
 
-        return response()->json($products, 200);
-    }
+    return response()->json($products, 200);
+}
 
     // Agregar un nuevo producto
     public function store(Request $request)
@@ -130,6 +130,7 @@ class ProductController extends Controller
             return response()->json(['error' => 'Error al actualizar el producto', 'details' => $e->getMessage()], 500);
         }
     }
+    
 
     public function deleteProduct($id)
     {
@@ -165,5 +166,8 @@ class ProductController extends Controller
 
     return response()->json($products, 200);
 }
+
+
+
 
 }
