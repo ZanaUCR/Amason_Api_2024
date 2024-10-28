@@ -5,6 +5,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\TicketController;
+use App\Http\Controllers\ProductController;
 
 use App\Http\Controllers\CartProductsController;
 
@@ -22,9 +23,12 @@ use App\Http\Controllers\RecommendationController;
 |
 */
 
+// Ruta para obtener el usuario autenticado
 Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
     return $request->user();
 });
+
+// Ruta de prueba para verificar si el servidor está en funcionamiento
 Route::get('/', function () {
     return response()->json(['message' => 'Hello World!']);
 });
@@ -54,5 +58,24 @@ Route::middleware(['auth:sanctum'])->get('/products/category/{categoryId}', [Rec
 
 
 Route::get('/recommendations', [RecommendationController::class, 'getRecommendations']);
+
+// Rutas para los productos
+
+   
+    // Obtener productos por tienda
+    Route::get('/products/store/{storeId}', [ProductController::class, 'getProductsByStore']);
+    
+    // Editar un producto
+    Route::put('/products/{id}', [ProductController::class, 'editProduct']);
+    
+    // Eliminar un producto
+    Route::delete('/products/{id}', [ProductController::class, 'deleteProduct']);
+
+    // Obtener productos por categoria 
+    Route::get('/products/category/{categoryId}', [ProductController::class, 'getProductsByCategory']);
+
+
+// Agregar un nuevo producto (acceso sin autenticación si lo deseas)
+Route::post('/products', [ProductController::class, 'store']);
 
 
