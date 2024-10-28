@@ -9,14 +9,30 @@ class Product extends Model
 {
     use HasFactory;
 
-    public function Category()
+    // Agrega los atributos que se pueden llenar de forma masiva
+    protected $fillable = ['name', 'description', 'price', 'stock', 'category_id', 'id_store'];
+
+    // Relación con la categoría
+    public function category()
     {
         return $this->belongsTo(Category::class);
     }
 
+    // Relación con las reseñas
     public function reviews()
-{
-    return $this->hasMany(Review::class);
-}
+    {
+        return $this->hasMany(Review::class);
+    }
 
+    // Relación con la tienda
+    public function store()
+    {
+        return $this->belongsTo(Store::class, 'id_store');
+    }
+
+    // Relación con las imágenes del producto
+    public function images()
+    {
+        return $this->hasMany(ProductImage::class);
+    }
 }
