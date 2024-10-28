@@ -45,7 +45,7 @@ Route::middleware(['auth:sanctum', 'role:customer'])->group(function () {
 
 
 
-Route::post('/cart/remove', [CartProductsController::class, 'removeProductUnits'])->name('cart.remove');
+Route::post('/cart/update-units', [CartProductsController::class, 'updateUnits'])->name('cart.update.units');
 Route::post('/cart/remove-product', [CartProductsController::class, 'removeProductFromCart'])->name('cart.remove.product');
 Route::post('/cart/removeall', [CartProductsController::class, 'removeAllProductsFromCart'])->name('cart.removeAll.product');
 

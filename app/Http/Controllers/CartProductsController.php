@@ -17,7 +17,7 @@ class CartProductsController extends Controller
         // Agregando productos con detalles como nombre y precio
         $quantityofproductsincart = count($listcartproducts);
         foreach ($listcartproducts as $cartproduct) {
-            $product = Product::find($cartproduct->product_id);
+            $product =  Product::where('product_id', $cartproduct->product_id)->firstOrFail();
             $cartproduct->product_name = $product->name;
             $cartproduct->product_price = $product->price;
             $cartproduct->product_description = $product->description;
