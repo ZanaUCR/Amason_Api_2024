@@ -149,6 +149,29 @@ public function getCombinedProductsInCategory($categoryId)
 }
 
 
+public function getRecomendationByHistory($categoryId)
+{
+    // $user = Auth::user(); // Obtiene el usuario autenticado
+    $user = User::getUserById(7); // El controlador delega la responsabilidad al modelo
+
+    // Obtener los productos comprados en la categoría especificada
+    $purchasedProducts = $user->getPurchasedProductsInCategory($categoryId);
+
+    // Obtener todos los productos en la categoría especificada
+    $allProductsInCategory = Product::getAllProductsInCategory($categoryId);
+
+    // Combinar los productos de ambas colecciones
+    $combinedProducts = $purchasedProducts->merge($allProductsInCategory)
+                                          ->unique('product_id')
+                                          ->values();
+
+    return response()->json($combinedProducts);
+}
+
+
+
+
+
     
   
 
