@@ -19,4 +19,12 @@ class Product extends Model
     return $this->hasMany(Review::class);
 }
 
+        // Product.php
+public static function getAllProductsInCategory($categoryId)
+{
+    return self::where('category_id', $categoryId)->get();
+}
+
+
+
 }

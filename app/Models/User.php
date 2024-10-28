@@ -71,4 +71,30 @@ class User extends Authenticatable
         return $this->hasMany(Order::class);
     }
 
+    public function getPurchasedProductsInCategory($categoryId)
+{
+    return $this->orders()
+        ->whereHas('orderItems.product', function ($query) use ($categoryId) {
+            $query->where('category_id', $categoryId);
+        })
+        ->with(['orderItems.product' => function ($query) use ($categoryId) {
+            $query->where('category_id', $categoryId);
+        }])
+        ->get()
+        ->flatMap(function ($order) {
+            return $order->orderItems->map(function ($orderItem) {
+                return $orderItem->product;
+            });
+        })
+        ->unique('product_id');
+}
+
+
+// User.php
+public static function getUserById($id)
+{
+    return self::findOrFail($id); // Aquí manejamos la consulta específica
+}
+
+
 }

@@ -42,8 +42,8 @@ Route::post('/cart/removeall', [CartProductsController::class, 'removeAllProduct
 
 
 
-
-Route::middleware(['auth:sanctum'])->get('/products/category/{categoryId}', [RecommendationController::class, 'getCombinedProductsInCategory']);
+// middleware(['auth:sanctum'])->
+Route::get('/products/category/{categoryId}', [RecommendationController::class, 'getRecomendationByHistory']);
 
 
 Route::get('/recommendations', [RecommendationController::class, 'getRecommendations']);
