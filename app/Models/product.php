@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Product extends Model
+class product extends Model
 {
     use HasFactory;
 
@@ -43,4 +43,20 @@ public static function getAllProductsInCategory($categoryId)
     {
         return $this->hasMany(ProductImage::class);
     }
+
+    // En Product.php (modelo)
+    public static function getCategoriesByProductIds($productIds)
+    {
+        return self::whereIn('product_id', $productIds)->pluck('category_id')->unique();
+    }
+
+    // En Product.php (modelo)
+    public static function getRecommendedProducts($categoryIds, $productIds)
+    {
+        return self::whereIn('category_id', $categoryIds)
+                ->whereNotIn('product_id', $productIds)
+                ->get();
+    }
+
+
 }
