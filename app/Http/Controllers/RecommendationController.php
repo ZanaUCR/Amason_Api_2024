@@ -12,18 +12,28 @@ use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Category;
 use App\Models\PaymentMethod;
+use App\Models\cart_products;
 
-class RecomendationController extends Controller
+class RecommendationController extends Controller
 {
 
 
-     //Basado en carrito
-     public function getRecommendations(Request $request)
-     {
-         return response()->json(['message' => 'API funcionando correctamente']);
-     }
-
-
+    public function getRecommendationByCart(Request $request)
+    {
+        $userId = $request->user()->id;
+    
+        // Llamamos al método en CartProducts para obtener los IDs de productos en el carrito
+        $cartProducts = cart_products::getUserCartProductIds($userId);
+    
+        // Llamamos al método en Product para obtener las categorías de los productos en el carrito
+        $categories = Product::getCategoriesByProductIds($cartProducts);
+    
+        // Llamamos al método en Product para obtener los productos recomendados
+        $recommendedProducts = Product::getRecommendedProducts($categories, $cartProducts);
+    
+        return response()->json($recommendedProducts, 200);
+    }
+    
 
 
     public function getProductsByCategory($categoryId)
