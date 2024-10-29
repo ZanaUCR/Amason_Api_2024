@@ -63,7 +63,9 @@ Route::get('stores/{storeId}/top-selling-products', [ReportController::class, 'g
 
 Route::middleware('auth:sanctum')->group(function () {
 Route::post('/tickets/{id}/assign', [TicketController::class, 'assignTicket']);
-Route::post('/tickets/{ticketId}/messages', [TicketController::class, 'addMessage']);
+Route::post('/tickets/{ticket_id}/messages', [TicketController::class, 'addMessage']);
+
+Route::get('/tickets/{ticket_id}/messages', [TicketController::class, 'getMessages']);
 
 
 

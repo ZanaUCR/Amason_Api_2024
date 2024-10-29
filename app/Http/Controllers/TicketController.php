@@ -76,14 +76,14 @@ class TicketController extends Controller
         return response()->json(['message' => 'Ticket not found'], 404);
     }
 
-    public function addMessage(Request $request, $ticketId)
+    public function addMessage(Request $request, $ticket_id)
 {
     $request->validate([
         'message' => 'required|string',
     ]);
 
     $message = Message::create([
-        'ticket_id' => $ticketId,
+        'ticket_id' => $ticket_id,
         'user_id' => auth()->id(), // Asume que el usuario está autenticado
         'message' => $request->message,
     ]);
@@ -121,6 +121,19 @@ public function userTickets(Request $request)
     return response()->json($tickets);
 }
 
+public function getMessages($ticket_id)
+    {
+        // Verifica que el ticket exista
+        $ticket = Ticket::find($ticket_id);
+        
+        if (!$ticket) {
+            return response()->json(['message' => 'Ticket no encontrado'], 404);
+        }
 
+        // Obtener los mensajes asociados al ticket
+        $messages = Message::where('ticket_id', $ticket_id)->get();
+
+        return response()->json($messages, 200);
+    }
 
 }
