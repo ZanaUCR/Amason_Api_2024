@@ -110,5 +110,17 @@ public function unassignedTickets(Request $request)
     }   
 }
 
+public function userTickets(Request $request)
+{
+    // Obtén el ID del usuario logueado
+    $userId = $request->user()->id;
+
+    // Recupera todos los tickets que pertenecen al usuario logueado
+    $tickets = Ticket::where('user_id', $userId)->get();
+
+    return response()->json($tickets);
+}
+
+
 
 }

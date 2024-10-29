@@ -69,7 +69,7 @@ Route::get('/tickets/unassigned', [TicketController::class, 'unassignedTickets']
 
 Route::middleware(['auth:sanctum'])->get('/products/category/{categoryId}', [RecomendationController::class, 'getCombinedProductsInCategory']);
 
-
+Route::middleware('auth:sanctum')->get('/user-tickets', [TicketController::class, 'userTickets']);
 Route::get('/recommendations', [RecomendationController::class, 'getRecommendations']);
 
 // Rutas para los productos
