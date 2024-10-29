@@ -9,7 +9,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\CategoryController; 
 use App\Http\Controllers\CartProductsController;
 
-use App\Http\Controllers\RecomendationController;
+use App\Http\Controllers\RecommendationController;
 
 
 /*
@@ -72,7 +72,7 @@ Route::get('/tickets/{ticket_id}/messages', [TicketController::class, 'getMessag
 
 Route::middleware(['auth:sanctum'])->get('/products/category/{categoryId}', [RecommendationController::class, 'getCombinedProductsInCategory']);
 Route::middleware('auth:sanctum')->get('/recommendationByCart', [RecommendationController::class, 'getRecommendationByCart']);
-=======
+
 Route::get('/tickets/unassigned', [TicketController::class, 'unassignedTickets']);
 
 });
