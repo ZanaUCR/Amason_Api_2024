@@ -58,9 +58,13 @@ Route::post('/cart/update-units', [CartProductsController::class, 'updateUnits']
 Route::post('/cart/remove-product', [CartProductsController::class, 'removeProductFromCart'])->name('cart.remove.product');
 Route::post('/cart/removeall', [CartProductsController::class, 'removeAllProductsFromCart'])->name('cart.removeAll.product');
 
+Route::get('stores/{storeId}/top-selling-products', [ReportController::class, 'getTopSellingProductsByStore']);
+
+
 Route::middleware('auth:sanctum')->group(function () {
 Route::post('/tickets/{id}/assign', [TicketController::class, 'assignTicket']);
 Route::post('/tickets/{ticketId}/messages', [TicketController::class, 'addMessage']);
+
 
 
 Route::get('/tickets/unassigned', [TicketController::class, 'unassignedTickets']);
