@@ -12,7 +12,7 @@ use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Category;
 use App\Models\PaymentMethod;
-use App\Models\CartProducts;
+use App\Models\cart_products;
 
 class RecommendationController extends Controller
 {
@@ -23,7 +23,7 @@ class RecommendationController extends Controller
         $userId = $request->user()->id;
     
         // Llamamos al método en CartProducts para obtener los IDs de productos en el carrito
-        $cartProducts = CartProducts::getUserCartProductIds($userId);
+        $cartProducts = cart_products::getUserCartProductIds($userId);
     
         // Llamamos al método en Product para obtener las categorías de los productos en el carrito
         $categories = Product::getCategoriesByProductIds($cartProducts);
