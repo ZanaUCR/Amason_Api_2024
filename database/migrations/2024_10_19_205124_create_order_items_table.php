@@ -13,7 +13,10 @@ return new class extends Migration
     {
         Schema::create('order_items', function (Blueprint $table) {
             $table->id(); // Auto-incremental
-            $table->foreignId('product_id')->constrained()->onDelete('cascade'); // Relación con la tabla de productos
+            // Foreign key a la tabla 'products'
+            $table->unsignedBigInteger('product_id'); // Columna para la relación con métodos de pago
+            $table->foreign('product_id')->references('product_id')->on('products')->onDelete('cascade');
+
             $table->unsignedBigInteger('order_id');
             $table->foreign('order_id')->references('order_id')->on('orders')->onDelete('cascade'); // Relación con la tabla de órdenes
             $table->integer('quantity'); // Cantidad
