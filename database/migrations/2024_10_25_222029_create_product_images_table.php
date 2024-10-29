@@ -13,7 +13,8 @@ return new class extends Migration
     {
         Schema::create('product_images', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('product_id')->constrained()->onDelete('cascade'); // Relación con la tabla products
+            $table->unsignedBigInteger('product_id'); // Columna para la relación con productos
+            $table->foreign('product_id')->references('product_id')->on('products')->onDelete('cascade');
             $table->string('image_path'); // Ruta donde se almacenará la imagen
             $table->timestamps(); // Timestamps created_at y updated_at
         });

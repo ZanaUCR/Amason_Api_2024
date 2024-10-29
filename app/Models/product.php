@@ -9,6 +9,8 @@ class Product extends Model
 {
     use HasFactory;
 
+    protected $primaryKey = 'product_id';
+
     // Agrega los atributos que se pueden llenar de forma masiva
     protected $fillable = ['name', 'description', 'price', 'stock', 'category_id', 'id_store'];
 
