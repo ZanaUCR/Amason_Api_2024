@@ -28,10 +28,10 @@ class TicketController extends Controller
             'notify_by' => 'nullable|string',
         ]);
 
-        // Handle file upload if exists
+
         $filePath = null;
         if ($request->hasFile('file')) {
-            $filePath = $request->file('file')->store('tickets_files', 'public'); // Esto guarda en storage/app/public/tickets_files
+            $filePath = $request->file('file')->store('tickets_files', 'public'); 
         }
 
         $userId = auth()->id();
@@ -40,6 +40,7 @@ class TicketController extends Controller
         $ticket = Ticket::create([
             'order_package' => $request->order_package,
             'claim_type' => $request->claim_type,
+            'status'=> 'open',
             'subject' => $request->subject,
             'description' => $request->description,
             'file' => $filePath, // Store the file path in the database
@@ -94,7 +95,8 @@ class TicketController extends Controller
 public function assignTicket(Request $request, $id)
 {
     $ticket = Ticket::findOrFail($id);
-    $ticket->admin_id = $request->admin_id; // ID del administrador que tomará el ticket
+    $adminId = $request->user()->id; // Obtener el ID del usuario autenticado
+    $ticket->admin_id = $adminId; // Asignar el ID del administrador que tomará el ticket
     $ticket->save();
 
     return response()->json($ticket);
@@ -110,6 +112,16 @@ public function unassignedTickets(Request $request)
     }   
 }
 
+public function assignedTickets(Request $request)
+{
+    if ($request->user()->hasRole('admin')) {
+        $admin_id = $request->user()->id; 
+        $tickets = Ticket::where('admin_id', $admin_id)->get();
+        return response()->json($tickets);
+    } else {
+        return response()->json(['error' => 'Unauthorized'], 401);
+    }
+}
 public function userTickets(Request $request)
 {
     // Obtén el ID del usuario logueado
@@ -134,6 +146,15 @@ public function getMessages($ticket_id)
         $messages = Message::where('ticket_id', $ticket_id)->get();
 
         return response()->json($messages, 200);
+    }
+
+    public function closeTicket($id)
+    {
+        $ticket = Ticket::findOrFail($id);
+        $ticket->status = 'closed';
+        $ticket->save();
+
+        return response()->json($ticket);
     }
 
 }
