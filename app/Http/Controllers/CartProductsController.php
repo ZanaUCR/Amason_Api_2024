@@ -8,28 +8,37 @@ use App\Models\product;
 
 class CartProductsController extends Controller
 {
+    public function categoriasparagael()
+{
+    $list = category::all(); // Asegúrate de usar el nombre correcto del modelo
 
-    public function showCart($userId)
+    return response()->json($list); // Retornar como JSON
+}
+
+    public function showCart()
     {
+        $userId = auth()->id(); // Obtén el ID del usuario autenticado
         $listcartproducts = cart_products::where('user_id', $userId)->get();
         $totalamount = 0;
-
+    
         // Agregando productos con detalles como nombre y precio
         $quantityofproductsincart = count($listcartproducts);
         foreach ($listcartproducts as $cartproduct) {
-            $product =  Product::where('product_id', $cartproduct->product_id)->firstOrFail();
+            $product = Product::where('product_id', $cartproduct->product_id)->firstOrFail();
             $cartproduct->product_name = $product->name;
             $cartproduct->product_price = $product->price;
             $cartproduct->product_description = $product->description;
+            $cartproduct->stock = $product->stock;
             $totalamount += $product->price * $cartproduct->quantity;
         }
-
+    
         return response()->json([
             'cart_products' => $listcartproducts,
             'total_amount' => $totalamount,
             'quantityofproductsincart' => $quantityofproductsincart
         ]);
     }
+    
 
     public function updateUnits(Request $request)
     {
@@ -67,6 +76,7 @@ class CartProductsController extends Controller
                 //*se verifica si ya existe ese producto en el carrito
                 if ($productincart) {
                     //* se actualiza la cantidad
+                    
                     $productincart->quantity += $quantity;
                     if ($stock < $productincart->quantity) {
                         return response()->json(['error' => 'No hay suficiente stock disponible después de la actualización.'], 400);
@@ -94,14 +104,18 @@ class CartProductsController extends Controller
     }
     public function searchProductInCart($idproducttoadd)
     {
-       // $productincart = cart_products::where('user_id', auth()->user()->id)->where('product_id', $idproducttoadd)->first();
-        $productincart = cart_products::where('user_id', 12)->where('product_id', $idproducttoadd)->first();
+
+        $productincart = cart_products::where('user_id', auth()->user()->id)->where('product_id', $idproducttoadd)->first();
+       
+
         return $productincart;
     }
     public function searchProductInCartByuser_id()
     {
-       // $productincart = cart_products::where('user_id', auth()->user()->id)->get();
-        $productincart = cart_products::where('user_id', 12)->get();
+ api-carrito-funcional
+        $productincart = cart_products::where('user_id', auth()->user()->id)->get();
+      
+
         return $productincart;
     }
 
@@ -115,8 +129,10 @@ class CartProductsController extends Controller
     public function addProductToCart($idproducttoadd, $quantitytoadd)
     {
         $newproductincart = new cart_products([
-           //  'user_id' =>  auth()->user()->id, 
-           'user_id' =>  12, 
+
+            'user_id' =>  auth()->user()->id, 
+          
+
             'product_id' => $idproducttoadd,
             'quantity' => $quantitytoadd,
         ]);

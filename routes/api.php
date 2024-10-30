@@ -38,10 +38,21 @@ Route::get('/', function () {
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::middleware('auth:sanctum')->post('/logout', [AuthController::class, 'logout']);
-Route::post('/cart/add', [CartProductsController::class, 'addToCart'])->name('cart.addToCart');
+
+Route::middleware(['auth:sanctum'])->group(function () {
+    Route::get('/cart', [CartProductsController::class, 'showCart'])->name('cart.showCart'); // Se elimina el userId de la ruta
+    Route::post('/cart/add', [CartProductsController::class, 'addToCart'])->name('cart.addToCart');
+    Route::post('/cart/update-units', [CartProductsController::class, 'updateUnits'])->name('cart.update.units');
+    Route::post('/cart/remove-product', [CartProductsController::class, 'removeProductFromCart'])->name('cart.remove.product');
+    Route::post('/cart/removeall', [CartProductsController::class, 'removeAllProductsFromCart'])->name('cart.removeAll.product');
+});
 
 
-Route::get('/cart/{userId}', [CartProductsController::class, 'showCart'])->name('cart.showCart');
+
+
+Route::get('/categorias', [CartProductsController::class, 'categoriasparagael'])->name('categories.list');
+
+
 
 
 //Route::resource('tickets', TicketController::class);
@@ -54,14 +65,13 @@ Route::get('/tickets/{id}', [TicketController::class, 'show']);
 
 
 
-Route::post('/cart/update-units', [CartProductsController::class, 'updateUnits'])->name('cart.update.units');
-Route::post('/cart/remove-product', [CartProductsController::class, 'removeProductFromCart'])->name('cart.remove.product');
-Route::post('/cart/removeall', [CartProductsController::class, 'removeAllProductsFromCart'])->name('cart.removeAll.product');
+
 
 Route::get('stores/{storeId}/top-selling-products', [ReportController::class, 'getTopSellingProductsByStore']);
 
 
 Route::middleware('auth:sanctum')->group(function () {
+
 Route::post('/tickets/{id}/assign', [TicketController::class, 'assignTicket']);
 Route::post('/tickets/{ticket_id}/messages', [TicketController::class, 'addMessage']);
 
@@ -75,6 +85,7 @@ Route::middleware('auth:sanctum')->get('/recommendationByCart', [RecommendationC
 
 Route::get('/tickets/unassigned', [TicketController::class, 'unassignedTickets']);
 
+
 });
 
 
@@ -85,22 +96,31 @@ Route::get('/recommendations', [RecomendationController::class, 'getRecommendati
 
 // Rutas para los productos
 
-   
-    // Obtener productos por tienda
-    Route::get('/products/store/{storeId}', [ProductController::class, 'getProductsByStore']);
-    
-    // Editar un producto
-    Route::put('/products/{id}', [ProductController::class, 'editProduct']);
-    
-    // Eliminar un producto
-    Route::delete('/products/{id}', [ProductController::class, 'deleteProduct']);
+
+
+// Obtener productos por tienda
+Route::get('/products/store/{storeId}', [ProductController::class, 'getProductsByStore']);
+
+// Editar un producto
+Route::put('/products/{id}', [ProductController::class, 'editProduct']);
+
+// Eliminar un producto
+Route::delete('/products/{id}', [ProductController::class, 'deleteProduct']);
+
+// Obtener productos por categoria 
+Route::get('/products/category/{categoryId}', [ProductController::class, 'getProductsByCategory']);
 
     // Obtener productos por categoria 
-    Route::get('/products/category/{categoryId}', [ProductController::class, 'getProductsByCategory']);
+
     Route::get('/categories', [CategoryController::class, 'getCategories']);
+
 
 
 // Agregar un nuevo producto (acceso sin autenticación si lo deseas)
 Route::post('/products', [ProductController::class, 'store']);
 
+
+Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
+    return response()->json(['user' => Auth::id()]);
+});
 
