@@ -10,6 +10,7 @@ use App\Http\Controllers\StockManagementController;
 class CartProductsController extends Controller
 {
     public function categoriasparagael()
+
     {
         $list = category::all(); // Asegúrate de usar el nombre correcto del modelo
 
@@ -17,12 +18,12 @@ class CartProductsController extends Controller
     }
 
     public function showCart()
-    {
+  
 
         $userId = auth()->id(); // Obtén el ID del usuario autenticado
         $listcartproducts = cart_products::where('user_id', $userId)->get();
         $totalamount = 0;
-
+    
         // Agregando productos con detalles como nombre y precio
         $quantityofproductsincart = count($listcartproducts);
         foreach ($listcartproducts as $cartproduct) {
@@ -33,13 +34,14 @@ class CartProductsController extends Controller
             $cartproduct->stock = $product->stock;
             $totalamount += $product->price * $cartproduct->quantity;
         }
-
+    
         return response()->json([
             'cart_products' => $listcartproducts,
             'total_amount' => $totalamount,
             'quantityofproductsincart' => $quantityofproductsincart
         ]);
     }
+    
 
 
     public function updateUnits(Request $request)
@@ -113,7 +115,8 @@ class CartProductsController extends Controller
     }
     public function searchProductInCart($idproducttoadd)
     {
-        $productincart = cart_products::where('user_id', auth()->user()->id)->where('product_id', $idproducttoadd)->first();
+
+        $productincart = cart_products::where('user_id', auth()->user()->id)->where('product_id', $idproducttoadd)->first();       
 
         return $productincart;
     }
@@ -142,7 +145,10 @@ class CartProductsController extends Controller
 
     public function searchProductInCartByuser_id()
     {
+
+ api-carrito-funcional
         $productincart = cart_products::where('user_id', auth()->user()->id)->get();
+      
 
         return $productincart;
     }
@@ -157,7 +163,9 @@ class CartProductsController extends Controller
     public function addProductToCart($idproducttoadd, $quantitytoadd)
     {
         $newproductincart = new cart_products([
-            'user_id' => auth()->user()->id,
+
+            'user_id' =>  auth()->user()->id, 
+          
 
             'product_id' => $idproducttoadd,
             'quantity' => $quantitytoadd,

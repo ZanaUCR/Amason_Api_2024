@@ -6,16 +6,17 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class product extends Model
-{
+{protected $primaryKey = 'product_id';
     use HasFactory;
 
     // Agrega los atributos que se pueden llenar de forma masiva
     protected $fillable = ['name', 'description', 'price', 'stock', 'category_id', 'id_store'];
+    protected $primaryKey = 'product_id'; // Si la clave primaria es 'product_id'
 
     // Relación con la categoría
     public function category()
     {
-        return $this->belongsTo(Category::class);
+        return $this->belongsTo(Category::class, 'category_id');
     }
 
     // Relación con las reseñas
@@ -33,7 +34,7 @@ class product extends Model
     // Relación con las imágenes del producto
     public function images()
     {
-        return $this->hasMany(ProductImage::class);
+        return $this->hasMany(ProductImage::class, 'product_id');
     }
 
     // En Product.php (modelo)
