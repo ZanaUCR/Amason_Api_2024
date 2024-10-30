@@ -5,18 +5,21 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\cart_products;
 use App\Models\product;
+use App\Http\Controllers\StockManagementController;
 
 class CartProductsController extends Controller
 {
     public function categoriasparagael()
-{
-    $list = category::all(); // Asegúrate de usar el nombre correcto del modelo
 
-    return response()->json($list); // Retornar como JSON
-}
+    {
+        $list = category::all(); // Asegúrate de usar el nombre correcto del modelo
+
+        return response()->json($list); // Retornar como JSON
+    }
 
     public function showCart()
-    {
+  
+
         $userId = auth()->id(); // Obtén el ID del usuario autenticado
         $listcartproducts = cart_products::where('user_id', $userId)->get();
         $totalamount = 0;
@@ -40,6 +43,7 @@ class CartProductsController extends Controller
     }
     
 
+
     public function updateUnits(Request $request)
     {
         // Compactar los datos en un solo Requesto
@@ -47,7 +51,7 @@ class CartProductsController extends Controller
             'idproduct' => $request->input('idproducttoupdate'),
             'quantity' => $request->input('quantity'),
         ]);
-    
+
         // Verificar la acción y llamar al método adecuado pasando el request
         if ($request->input('action') === 'add') {
             $this->addToCart($data);
@@ -55,7 +59,7 @@ class CartProductsController extends Controller
             $this->removeProductUnits($data);
         }
     }
-    
+
 
     //todo    Metodo para agregar al carrito, se recibe un objeto cart_products, con quantity y product_id definidos, el user_id se obtiene de la session
     public function addToCart(Request $request)
@@ -76,20 +80,27 @@ class CartProductsController extends Controller
                 //*se verifica si ya existe ese producto en el carrito
                 if ($productincart) {
                     //* se actualiza la cantidad
-                    
+
                     $productincart->quantity += $quantity;
                     if ($stock < $productincart->quantity) {
                         return response()->json(['error' => 'No hay suficiente stock disponible después de la actualización.'], 400);
                     }
+                    
                     $productincart->save();
                 } else {
-                    
+                    $this->reduceStock($idproducttoadd, $quantitytoadd);
+                   
+
                     $this->addProductToCart($idproducttoadd, $quantitytoadd);
                     return response()->json(['message' => 'El producto se ha agregado al carrito.'], 201);
-               
+
                 }
+
+               
+                $this->reduceStock($idproducttoadd, $quantitytoadd);
                 //* mensaje caso exitoso
                 return response()->json(['message' => 'Cantidad actualizada en el carrito.'], 200);
+             
             } else {
 
                 //! mensaje caso no hay stock
@@ -105,13 +116,36 @@ class CartProductsController extends Controller
     public function searchProductInCart($idproducttoadd)
     {
 
-        $productincart = cart_products::where('user_id', auth()->user()->id)->where('product_id', $idproducttoadd)->first();
-       
+        $productincart = cart_products::where('user_id', auth()->user()->id)->where('product_id', $idproducttoadd)->first();       
 
         return $productincart;
     }
+
+    public function reduceStock($idproducttoadd, $quantitytoadd)
+    {
+        $stockController = new StockManagementController();
+        $stockRequest = new Request([
+            'product_id' => $idproducttoadd,
+            'quantity_change' => $quantitytoadd,
+        ]);
+        $stockController->decreaseProductStock($stockRequest);
+    }
+
+    public function addStock($idproducttoremove, $quantitytoremove)
+    {
+        $stockController = new StockManagementController();
+        $stockRequest = new Request([
+            'product_id' => $idproducttoremove,
+            'quantity_change' => $quantitytoremove,
+        ]);
+        $stockController->increaseProductStock($stockRequest);
+    }
+
+
+
     public function searchProductInCartByuser_id()
     {
+
  api-carrito-funcional
         $productincart = cart_products::where('user_id', auth()->user()->id)->get();
       
@@ -155,7 +189,7 @@ class CartProductsController extends Controller
             if ($productincart->quantity >= $quantitytoremove) {
 
                 $productincart->quantity -= $quantitytoremove;
-
+                $this->addStock($idproducttoremove, $quantitytoremove);
                 //* Si la cantidad es 0, eliminar el producto del carrito
                 if ($productincart->quantity == 0) {
                     $productincart->delete();
@@ -187,6 +221,7 @@ class CartProductsController extends Controller
             //* Buscar el producto en el carrito 
             //  $productincart = cart_products::where('user_id', auth()->user()->id)->where('product_id', $idproducttoremove)->firstOrFail();
             $productincart = $this->searchProductInCart($idproducttoremove);
+            $this->addStock($idproducttoremove, $productincart->quantity);
 
             $productincart->delete();
             return response()->json(['message' => 'El producto se ha eliminado del carrito.'], 200);
@@ -205,6 +240,7 @@ class CartProductsController extends Controller
             $productincart = $this->searchProductInCartByuser_id();
 
             foreach ($productincart as $product) {
+                $this->addStock($productincart->product_id, $productincart->quantity);
                 $product->delete();
             }
             return response()->json(['message' => 'El producto se ha eliminado del carrito.'], 200);
