@@ -149,7 +149,7 @@ public function getCombinedProductsInCategory($categoryId)
 public function getRecomendationByHistory($categoryId)
 {
     // $user = Auth::user(); // Obtiene el usuario autenticado
-    $user = User::getUserById(7); // El controlador delega la responsabilidad al modelo
+    $user = User::getUserById(4); // El controlador delega la responsabilidad al modelo
 
     // Obtener los productos comprados en la categoría especificada
     $purchasedProducts = $user->getPurchasedProductsInCategory($categoryId);
@@ -157,13 +157,51 @@ public function getRecomendationByHistory($categoryId)
     // Obtener todos los productos en la categoría especificada
     $allProductsInCategory = Product::getAllProductsInCategory($categoryId);
 
-    // Combinar los productos de ambas colecciones
-    $combinedProducts = $purchasedProducts->merge($allProductsInCategory)
-                                          ->unique('product_id')
-                                          ->values();
+    $combinedProducts = $purchasedProducts->concat($allProductsInCategory)
+    ->unique('product_id')
+    ->values();
 
-    return response()->json($combinedProducts);
+    // Mapear los productos para incluir el image_path
+    $result = $combinedProducts->map(function ($product) {
+        return [
+            'product_id' => $product->product_id, // Ajusta según el nombre de tu ID
+            'name' => $product->name, // Ajusta si necesitas más atributos
+            'price' => $product->price, // Asegúrate de que 'price' esté en tu modelo
+            'description' => $product->description, // Asegúrate de que 'description' esté en tu modelo
+            'image_path' => $product->images->isNotEmpty() ? $product->images->first()->image_path : null, // Asegúrate de que no esté vacío
+        ];
+    });
+
+    return response()->json($result);
 }
+
+
+public function testProductImages($categoryId)
+{
+    $user = User::find(4); // O el ID del usuario que quieras
+    $purchasedProducts = $user->getPurchasedProductsInCategory($categoryId);
+    $allProductsInCategory = Product::getAllProductsInCategory($categoryId);
+
+    // Verificar si se están obteniendo imágenes
+    foreach ($purchasedProducts as $product) {
+        if ($product->images->isEmpty()) {
+            dd("No hay imágenes para el producto ID: " . $product->id);
+        }
+    }
+
+    foreach ($allProductsInCategory as $product) {
+        if ($product->images->isEmpty()) {
+            dd("No hay imágenes para el producto ID: " . $product->id);
+        }
+    }
+
+    return response()->json([
+        'purchasedProducts' => $purchasedProducts,
+        'allProductsInCategory' => $allProductsInCategory,
+    ]);
+}
+
+
 
 
 

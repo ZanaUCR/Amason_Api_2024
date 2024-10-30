@@ -72,22 +72,29 @@ class User extends Authenticatable
     }
 
     public function getPurchasedProductsInCategory($categoryId)
-{
-    return $this->orders()
-        ->whereHas('orderItems.product', function ($query) use ($categoryId) {
-            $query->where('category_id', $categoryId);
-        })
-        ->with(['orderItems.product' => function ($query) use ($categoryId) {
-            $query->where('category_id', $categoryId);
-        }])
-        ->get()
-        ->flatMap(function ($order) {
-            return $order->orderItems->map(function ($orderItem) {
-                return $orderItem->product;
-            });
-        })
-        ->unique('product_id');
-}
+    {
+        return $this->orders()
+            ->whereHas('orderItems.product', function ($query) use ($categoryId) {
+                $query->where('category_id', $categoryId);
+            })
+            ->with(['orderItems' => function ($query) use ($categoryId) {
+                $query->whereHas('product', function ($query) use ($categoryId) {
+                    $query->where('category_id', $categoryId);
+                });
+            }, 'orderItems.product.images'])
+            ->get()
+            ->flatMap(function ($order) {
+                return $order->orderItems->map(function ($orderItem) {
+                    $product = $orderItem->product;
+                    $product->setRelation('images', $product->images);
+                    return $product;
+                });
+            })
+            ->values(); // Eliminamos 'unique' para evitar que limite los resultados a uno solo
+    }
+    
+    
+    
 
 
 // User.php

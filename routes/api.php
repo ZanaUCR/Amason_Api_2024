@@ -66,37 +66,19 @@ Route::get('/tickets/{id}', [TicketController::class, 'show']);
 
 
 // middleware(['auth:sanctum'])->
-Route::get('/recommended/products/category/{categoryId}', [RecommendationController::class, 'getCombinedProductsInCategory']);
-
-<<<<<<< HEAD
-=======
-
-Route::get('stores/{storeId}/top-selling-products', [ReportController::class, 'getTopSellingProductsByStore']);
-
-
-Route::middleware('auth:sanctum')->group(function () {
-
-Route::post('/tickets/{id}/assign', [TicketController::class, 'assignTicket']);
-Route::post('/tickets/{ticket_id}/messages', [TicketController::class, 'addMessage']);
-
-Route::get('/tickets/{ticket_id}/messages', [TicketController::class, 'getMessages']);
-
-
-
-
 Route::get('/recommended/products/category/{categoryId}', [RecommendationController::class, 'getRecomendationByHistory']);
->>>>>>> main
+Route::get('/recommended/test/products/category/{categoryId}', [RecommendationController::class, 'testProductImages']);
+
 Route::middleware('auth:sanctum')->get('/recommendationByCart', [RecommendationController::class, 'getRecommendationByCart']);
 
 Route::get('/tickets/unassigned', [TicketController::class, 'unassignedTickets']);
 
 
-});
 
 
 
 Route::middleware('auth:sanctum')->get('/user-tickets', [TicketController::class, 'userTickets']);
-Route::get('/recommendations', [RecomendationController::class, 'getRecommendations']);
+
 
 
 // Rutas para los productos
