@@ -15,7 +15,8 @@ return new class extends Migration {
             $table->string('order_package');
             $table->string('claim_type');
             $table->string('subject');
-            $table->text('description');
+            $table->text(column: 'description');
+            $table->enum('status', ['open', 'closed'])->default(value: 'open');
             $table->string('file')->nullable();
             $table->string('notify_by')->nullable();
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');

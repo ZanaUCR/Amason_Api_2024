@@ -36,114 +36,67 @@ class RecommendationController extends Controller
     
 
 
-    public function getProductsByCategory($categoryId)
-    {
-        $userId = Auth::id(); // Obtiene el ID del usuario autenticado
-    
-        // Encuentra el usuario autenticado
-        $user = User::findOrFail(7);
-    
-        // Paso 1: Obtener productos que el usuario ya compró en la categoría específica
-        $purchasedProductIds = $user->orders()
-            ->whereHas('orderItems.product', function ($query) use ($categoryId) {
-                $query->where('category_id', $categoryId);
-            })
-            ->with('orderItems.product')
-            ->get()
-            ->flatMap(function ($order) {
-                return $order->orderItems->pluck('product_id');
-            })
-            ->unique(); // Lista de IDs de productos comprados, sin duplicados
-    
-        // Paso 2: Obtener todos los productos de la categoría
-        $allCategoryProducts = Product::where('category_id', $categoryId)->get();
-    
-        // Paso 3: Filtrar productos que el usuario no ha comprado
-        $remainingProducts = $allCategoryProducts->filter(function ($product) use ($purchasedProductIds) {
-            return !$purchasedProductIds->contains($product->product_id);
-        });
-    
-        // Paso 4: Combinar productos comprados y no comprados en un solo listado
-        $combinedProducts = $allCategoryProducts->whereIn('product_id', $purchasedProductIds)->merge($remainingProducts);
-    
-        // Retorna la lista de productos en formato JSON
-        return response()->json($combinedProducts);
-    }
 
 
-    public function getProductsPurchasedInCategory($categoryId)
-    {
-        $userId = Auth::id(); // Obtiene el ID del usuario autenticado
-    
-        // Encuentra el usuario autenticado
-        $user = User::findOrFail(7);
-    
-        // Obtener los productos comprados por el usuario en la categoría especificada
-        $purchasedProducts = $user->orders()
-            ->whereHas('orderItems.product', function ($query) use ($categoryId) {
-                $query->where('category_id', $categoryId); // Filtrar por la categoría
-            })
-            ->with(['orderItems.product' => function ($query) use ($categoryId) {
-                $query->where('category_id', $categoryId); // Filtrar también aquí para obtener solo productos de la categoría
-            }])
-            ->get()
-            ->flatMap(function ($order) {
-                // Aplanar y retornar solo los productos de los items de orden
-                return $order->orderItems->map(function ($orderItem) {
-                    return $orderItem->product;
-                });
-            })
-            ->unique('product_id'); // Elimina duplicados basados en el `product_id`
-    
-        // Retorna los productos en formato JSON
-        return response()->json($purchasedProducts);
-    }
-
-    public function getAllProductsInCategory($categoryId)
+public function getRecommendationByHistory($categoryId)
 {
-    // Obtener todos los productos que pertenecen a la categoría especificada
-    $productsInCategory = Product::where('category_id', $categoryId)->get();
+    // $user =  ;// Obtiene el usuario autenticado
+    $user =  Auth::user();// Obtiene el usuario autenticado
 
-    // Retornar los productos en formato JSON
-    return response()->json($productsInCategory);
+    // Obtener los productos comprados en la categoría especificada
+    $purchasedProducts = $user->getPurchasedProductsInCategory($categoryId);
+
+    // Obtener todos los productos en la categoría especificada
+    $allProductsInCategory = Product::getAllProductsInCategory($categoryId);
+
+    $combinedProducts = $purchasedProducts->concat($allProductsInCategory)
+    ->unique('product_id')
+    ->values();
+
+    // Mapear los productos para incluir el image_path
+    $result = $combinedProducts->map(function ($product) {
+        return [
+            'product_id' => $product->product_id, // Ajusta según el nombre de tu ID
+            'name' => $product->name, // Ajusta si necesitas más atributos
+            'price' => $product->price, // Asegúrate de que 'price' esté en tu modelo
+            'description' => $product->description, // Asegúrate de que 'description' esté en tu modelo
+            'image_path' => $product->images->isNotEmpty() ? $product->images->first()->image_path : null, // Asegúrate de que no esté vacío
+        ];
+    });
+
+    return response()->json($result);
 }
 
 
-public function getCombinedProductsInCategory($categoryId)
+public function testProductImages($categoryId)
 {
-    $userId = Auth::id(); // Obtiene el ID del usuario autenticado
+    $user = User::find(4); // O el ID del usuario que quieras
+    $purchasedProducts = $user->getPurchasedProductsInCategory($categoryId);
+    $allProductsInCategory = Product::getAllProductsInCategory($categoryId);
 
-    // Encuentra el usuario autenticado
-    $user = User::findOrFail(4);
+    // Verificar si se están obteniendo imágenes
+    foreach ($purchasedProducts as $product) {
+        if ($product->images->isEmpty()) {
+            dd("No hay imágenes para el producto ID: " . $product->id);
+        }
+    }
 
-    // Obtener los productos comprados por el usuario en la categoría especificada
-    $purchasedProducts = $user->orders()
-        ->whereHas('orderItems.product', function ($query) use ($categoryId) {
-            $query->where('category_id', $categoryId); // Filtrar por la categoría
-        })
-        ->with(['orderItems.product' => function ($query) use ($categoryId) {
-            $query->where('category_id', $categoryId); // Filtrar también aquí para obtener solo productos de la categoría
-        }])
-        ->get()
-        ->flatMap(function ($order) {
-            // Aplanar y retornar solo los productos de los items de orden
-            return $order->orderItems->map(function ($orderItem) {
-                return $orderItem->product;
-            });
-        })
-        ->unique('product_id'); // Elimina duplicados basados en el `product_id`
+    foreach ($allProductsInCategory as $product) {
+        if ($product->images->isEmpty()) {
+            dd("No hay imágenes para el producto ID: " . $product->id);
+        }
+    }
 
-    // Obtener todos los productos de la categoría especificada
-    $allProductsInCategory = Product::where('category_id', $categoryId)->get();
-
-    // Combinar los productos de ambas colecciones respetando el orden: primero comprados, luego el resto
-    $combinedProducts = $purchasedProducts->merge($allProductsInCategory)
-                                          ->unique('product_id') // Elimina duplicados basados en `product_id`
-                                          ->values(); // Reindexa la colección para asegurar un índice ordenado
-
-    // Retornar los productos combinados en formato JSON
-    return response()->json($combinedProducts);
+    return response()->json([
+        'purchasedProducts' => $purchasedProducts,
+        'allProductsInCategory' => $allProductsInCategory,
+    ]);
 }
+
+
+
+
+
 
 
     
