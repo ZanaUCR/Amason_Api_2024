@@ -48,14 +48,14 @@ class product extends Model
     }
     
     
-
-    // En Product.php (modelo)
     public static function getRecommendedProducts($categoryIds, $productIds)
     {
-        return self::whereIn('id', $categoryIds)
+        return self::whereIn('category_id', $categoryIds)
                 ->whereNotIn('product_id', $productIds)
+                ->with('images') // Carga las imágenes relacionadas
                 ->get();
     }
+
 
 
 }
