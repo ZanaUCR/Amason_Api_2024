@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class CartProducts extends Model
+class cart_products extends Model
 {
     use HasFactory;
 
@@ -35,4 +35,11 @@ class CartProducts extends Model
     {
         return $this->belongsTo(Product::class, 'product_id', 'id');
     }
+
+    // En CartProducts.php (modelo)
+    public static function getUserCartProductIds($userId)
+    {
+        return self::where('user_id', $userId)->pluck('product_id');
+    }
+
 }
