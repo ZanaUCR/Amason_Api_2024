@@ -41,7 +41,7 @@ class RecommendationController extends Controller
 public function getRecommendationByHistory($categoryId)
 {
     // $user =  ;// Obtiene el usuario autenticado
-    $user =  Auth::user()// Obtiene el usuario autenticado
+    $user =  Auth::user();// Obtiene el usuario autenticado
 
     // Obtener los productos comprados en la categoría especificada
     $purchasedProducts = $user->getPurchasedProductsInCategory($categoryId);
