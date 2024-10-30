@@ -80,7 +80,7 @@ Route::get('/tickets/{ticket_id}/messages', [TicketController::class, 'getMessag
 
 
 
-Route::middleware(['auth:sanctum'])->get('/products/category/{categoryId}', [RecommendationController::class, 'getCombinedProductsInCategory']);
+Route::get('/recommended/products/category/{categoryId}', [RecommendationController::class, 'getRecomendationByHistory']);
 Route::middleware('auth:sanctum')->get('/recommendationByCart', [RecommendationController::class, 'getRecommendationByCart']);
 
 Route::get('/tickets/unassigned', [TicketController::class, 'unassignedTickets']);
