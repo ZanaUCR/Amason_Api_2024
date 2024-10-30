@@ -8,7 +8,7 @@ use App\Models\product;
 
 class CartProductsController extends Controller
 {
-    public function categoriasparagael()
+    public function getCategories()
 {
     $list = category::all(); // Asegúrate de usar el nombre correcto del modelo
 

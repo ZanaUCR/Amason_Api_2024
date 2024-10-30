@@ -50,7 +50,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
 
 
-Route::get('/categorias', [CartProductsController::class, 'categoriasparagael'])->name('categories.list');
+Route::get('/categorias', [CartProductsController::class, 'getCategories'])->name('categories.list');
 
 
 
