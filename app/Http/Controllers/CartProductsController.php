@@ -104,14 +104,18 @@ class CartProductsController extends Controller
     }
     public function searchProductInCart($idproducttoadd)
     {
+
         $productincart = cart_products::where('user_id', auth()->user()->id)->where('product_id', $idproducttoadd)->first();
        
+
         return $productincart;
     }
     public function searchProductInCartByuser_id()
     {
+ api-carrito-funcional
         $productincart = cart_products::where('user_id', auth()->user()->id)->get();
       
+
         return $productincart;
     }
 
@@ -125,8 +129,10 @@ class CartProductsController extends Controller
     public function addProductToCart($idproducttoadd, $quantitytoadd)
     {
         $newproductincart = new cart_products([
+
             'user_id' =>  auth()->user()->id, 
           
+
             'product_id' => $idproducttoadd,
             'quantity' => $quantitytoadd,
         ]);

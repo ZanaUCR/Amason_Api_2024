@@ -6,10 +6,10 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\TicketController;
 use App\Http\Controllers\ProductController;
-
+use App\Http\Controllers\CategoryController; 
 use App\Http\Controllers\CartProductsController;
 
-use App\Http\Controllers\RecomendationController;
+use App\Http\Controllers\RecommendationController;
 
 
 /*
@@ -67,21 +67,35 @@ Route::get('/tickets/{id}', [TicketController::class, 'show']);
 
 
 
+Route::get('stores/{storeId}/top-selling-products', [ReportController::class, 'getTopSellingProductsByStore']);
+
+
 Route::middleware('auth:sanctum')->group(function () {
-    Route::post('/tickets/{id}/assign', [TicketController::class, 'assignTicket']);
-    Route::post('/tickets/{ticketId}/messages', [TicketController::class, 'addMessage']);
+
+Route::post('/tickets/{id}/assign', [TicketController::class, 'assignTicket']);
+Route::post('/tickets/{ticket_id}/messages', [TicketController::class, 'addMessage']);
+
+Route::get('/tickets/{ticket_id}/messages', [TicketController::class, 'getMessages']);
 
 
-    Route::get('/tickets/unassigned', [TicketController::class, 'unassignedTickets']);
+
+
+Route::middleware(['auth:sanctum'])->get('/products/category/{categoryId}', [RecommendationController::class, 'getCombinedProductsInCategory']);
+Route::middleware('auth:sanctum')->get('/recommendationByCart', [RecommendationController::class, 'getRecommendationByCart']);
+
+Route::get('/tickets/unassigned', [TicketController::class, 'unassignedTickets']);
+
 
 });
 
-Route::middleware(['auth:sanctum'])->get('/products/category/{categoryId}', [RecomendationController::class, 'getCombinedProductsInCategory']);
 
 
+Route::middleware('auth:sanctum')->get('/user-tickets', [TicketController::class, 'userTickets']);
 Route::get('/recommendations', [RecomendationController::class, 'getRecommendations']);
 
+
 // Rutas para los productos
+
 
 
 // Obtener productos por tienda
@@ -95,6 +109,11 @@ Route::delete('/products/{id}', [ProductController::class, 'deleteProduct']);
 
 // Obtener productos por categoria 
 Route::get('/products/category/{categoryId}', [ProductController::class, 'getProductsByCategory']);
+
+    // Obtener productos por categoria 
+
+    Route::get('/categories', [CategoryController::class, 'getCategories']);
+
 
 
 // Agregar un nuevo producto (acceso sin autenticación si lo deseas)
