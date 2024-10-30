@@ -48,6 +48,11 @@ class product extends Model
     }
     
     
+    public static function getCategoriesByProductIds($productIds)
+    {
+        return self::whereIn('product_id', $productIds)->pluck('category_id')->unique();
+    }
+
     public static function getRecommendedProducts($categoryIds, $productIds)
     {
         return self::whereIn('category_id', $categoryIds)
