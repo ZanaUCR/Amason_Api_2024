@@ -18,7 +18,8 @@ return new class extends Migration {
             $table->text('description');
             $table->string('file')->nullable();
             $table->string('notify_by')->nullable();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+            $table->foreignId('admin_id')->nullable()->constrained('users')->onDelete('set null');
             $table->timestamps();
         });
     }

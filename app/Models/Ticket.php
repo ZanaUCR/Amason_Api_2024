@@ -15,7 +15,8 @@ class Ticket extends Model
         'subject',
         'description',
         'file',
-        'notify_by'
+        'notify_by',
+        'user_id' // This is the foreign key
     ];
 
     public function user()
