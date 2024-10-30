@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\cart_products;
 use App\Models\product;
-use App\Models\category;
+    use App\Models\category;
 use App\Http\Controllers\StockManagementController;
 
 class CartProductsController extends Controller
@@ -237,22 +237,23 @@ class CartProductsController extends Controller
 
     //todo    Metodo para remover un producto del carrito 
     public function removeAllProductsFromCart()
-    {
-        try {
-            //* Buscar el producto en el carrito 
-            $productincart = $this->searchProductInCartByuser_id();
+{
+    try {
+        // Buscar los productos en el carrito para el usuario
+        $productsInCart = $this->searchProductInCartByuser_id();
 
-            foreach ($productincart as $product) {
-                $this->addStock($productincart->product_id, $productincart->quantity);
-                $product->delete();
-            }
-            return response()->json(['message' => 'El producto se ha eliminado del carrito.'], 200);
-        } catch (\Exception $e) {
-
-            //! mensaje de error
-            return response()->json(['error' => 'Ocurrió un error al intentar actualizar el carrito.'], 500);
+        foreach ($productsInCart as $product) {
+            // Ajustar el stock de cada producto
+            $this->addStock($product->product_id, $product->quantity);
+            $product->delete();
         }
+        return response()->json(['message' => 'Los productos se han eliminado del carrito.'], 200);
+    } catch (\Exception $e) {
+        // Manejo de errores
+        return response()->json(['error' => 'Ocurrió un error al intentar actualizar el carrito.'], 500);
     }
+}
+
 
 
 }
