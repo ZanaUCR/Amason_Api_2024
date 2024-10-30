@@ -17,7 +17,7 @@ class CartProductsController extends Controller
         return response()->json($list); // Retornar como JSON
     }
 
-    public function showCart()
+    public function showCart(){
   
 
         $userId = auth()->id(); // Obtén el ID del usuario autenticado
