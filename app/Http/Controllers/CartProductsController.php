@@ -112,7 +112,7 @@ class CartProductsController extends Controller
     }
     public function searchProductInCartByuser_id()
     {
- api-carrito-funcional
+
         $productincart = cart_products::where('user_id', auth()->user()->id)->get();
       
 
