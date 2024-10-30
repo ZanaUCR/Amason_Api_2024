@@ -32,6 +32,7 @@ class CartProductsController extends Controller
             $cartproduct->product_price = $product->price;
             $cartproduct->product_description = $product->description;
             $cartproduct->stock = $product->stock;
+            $cartproduct->product_image = $product->images->first()->image_path ?? 'default_image_path';
             $totalamount += $product->price * $cartproduct->quantity;
         }
     
@@ -146,7 +147,8 @@ class CartProductsController extends Controller
     public function searchProductInCartByuser_id()
     {
 
- api-carrito-funcional
+
+
         $productincart = cart_products::where('user_id', auth()->user()->id)->get();
       
 
