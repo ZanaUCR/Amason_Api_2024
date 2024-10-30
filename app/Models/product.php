@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class product extends Model
-{
+{protected $primaryKey = 'product_id';
     use HasFactory;
 
     // Agrega los atributos que se pueden llenar de forma masiva
