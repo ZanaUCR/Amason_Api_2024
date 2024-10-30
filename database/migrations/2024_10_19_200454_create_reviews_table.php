@@ -13,16 +13,13 @@ return new class extends Migration
     {
         Schema::create('reviews', function (Blueprint $table) {
 
-            $table->id('review_id'); // Clave primari
-    
-            // Foreign key a la tabla 'users'
+            $table->id();
+
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
     
-            // Foreign key a la tabla 'products'
             $table->foreignId('product_id')->constrained()->onDelete('cascade');
     
-            // Otros campos
-            $table->integer('calification'); // Calificación (1-5, por ejemplo)
+            $table->integer('calification'); 
             $table->string('comment');
             $table->timestamp('review_date')->nullable();
     

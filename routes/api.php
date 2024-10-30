@@ -3,7 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
-
+use App\Http\Controllers\ReviewController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -24,3 +24,8 @@ Route::get('/', function () {
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::middleware('auth:sanctum')->post('/logout', [AuthController::class, 'logout']);
+
+//Rutas para review
+Route::middleware('auth:sanctum')->post('/publishReview/{product_id}', [ReviewController::class, 'publishReview']);
+Route::middleware('auth:sanctum')->put('/updateReview/{review_id}', [ReviewController::class, 'updateReview']);
+Route::middleware('auth:sanctum')->delete('/deleteReview/{review_id}', [ReviewController::class, 'deleteReview']);
