@@ -67,7 +67,7 @@ Route::get('/tickets/{id}', [TicketController::class, 'show']);
 
 
 // middleware(['auth:sanctum'])->
-Route::get('/recommended/products/category/{categoryId}', [RecommendationController::class, 'getRecomendationByHistory']);
+Route::middleware('auth:sanctum')->get('/recommended/products/category/{categoryId}', [RecommendationController::class, 'getRecommendationByHistory']);
 Route::get('/recommended/test/products/category/{categoryId}', [RecommendationController::class, 'testProductImages']);
 
 

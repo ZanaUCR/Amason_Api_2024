@@ -48,14 +48,19 @@ class product extends Model
     }
     
     
+    public static function getCategoriesByProductIds($productIds)
+    {
+        return self::whereIn('product_id', $productIds)->pluck('category_id')->unique();
+    }
 
-    // En Product.php (modelo)
     public static function getRecommendedProducts($categoryIds, $productIds)
     {
-        return self::whereIn('id', $categoryIds)
+        return self::whereIn('category_id', $categoryIds)
                 ->whereNotIn('product_id', $productIds)
+                ->with('images') // Carga las imágenes relacionadas
                 ->get();
     }
+
 
 
 }
