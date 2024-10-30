@@ -16,7 +16,6 @@ class Order extends Model
         return $this->hasMany(order_item::class, 'order_id', 'order_id');
 
     }
-
     public function orderTransactions()
     {
         return $this->belongsTo(Transaction::class, 'transaction_id', 'transaction_id');
@@ -27,6 +26,16 @@ class Order extends Model
     {
         return $this->belongsTo(User::class, 'user_id', 'id');
     }
+
+    public function paymentMethod()
+    {
+        return $this->belongsTo(PaymentMethod::class, 'payment_method_id', 'payment_method_id');
+    }
+
+    public function orders() {
+        return $this->hasMany(Order::class);
+    }
+    
 
 
     
