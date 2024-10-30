@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\cart_products;
 use App\Models\product;
+use App\Models\category;
 use App\Http\Controllers\StockManagementController;
 
 class CartProductsController extends Controller
