@@ -18,7 +18,7 @@ class ReviewDeleteTest extends TestCase
 
      $user = User::find(7);
      $this->actingAs($user);
-     $review_id = 4;
+     $review_id = 5;
      /*
      $product = Product::factory()->create();
      $review = Review::factory()->create([
@@ -30,6 +30,8 @@ class ReviewDeleteTest extends TestCase
      */
 
      // Hacer la solicitud DELETE
+
+
      $response = $this->delete("/api/deleteReview/{$review_id}" , [
          'review_id' => $review_id, 
      ]);

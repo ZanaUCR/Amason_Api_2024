@@ -41,7 +41,7 @@ class ReviewController extends Controller
         ]);
 
         $user_id = auth()->id();
-        $review = Review::where('user_id', $user_id)
+        $review = Review::where('user_id', $user_id) // cuando se simula un usuario no funciona esta usando esta linea de usuario id
             ->where('id', $review_id)
             ->first();
 
@@ -59,14 +59,44 @@ class ReviewController extends Controller
     }
 
 
+    public function changeCalification(Request $request, $review_id)
+    {
 
-    public function deleteReview($review_id) 
+        $request->validate([
+            'calification' => 'required|integer|min:1|max:5',
+        ]);
+
+        $user_id = auth()->id();
+        $review = Review::where('user_id', $user_id)
+            ->where('id', $review_id)
+            ->first();
+
+        if (!$review) {
+            return response()->json(['message' => 'Review not found'], 404);
+        }
+
+        $review->update([
+            'calification' => $request->input('calification'),
+            'updated_at' => $request->input('updated_at'),
+        ]);
+
+        return response()->json(['message' => 'Review updated successfully', 'review' => $review], 200);
+    }
+
+
+    public function showReview(Request $request, $review_id)
+    {
+        //  
+
+        //return response()->json(['message' => 'Review updated successfully', 'review' => $review], 200);
+    }
+
+    public function deleteReview($review_id)
     {
         $user_id = auth()->id();
 
-
-        $review = Review::where('user_id', $user_id)
-            ->where('id', $review_id) 
+        $review = Review::where('user_id', $user_id) //quitar user_id para probar
+            ->where('id', $review_id)
             ->first();
 
         if (!$review) {
