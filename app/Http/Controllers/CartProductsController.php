@@ -239,17 +239,13 @@ class CartProductsController extends Controller
     public function removeAllProductsFromCart()
     {
         try {
-            //* Buscar el producto en el carrito 
-            $productincart = $this->searchProductInCartByuser_id();
-
-            foreach ($productincart as $product) {
-                $this->addStock($productincart->product_id, $productincart->quantity);
+            $productsInCart = $this->searchProductInCartByuser_id();
+            foreach ($productsInCart as $product) {
+                $this->addStock($product->product_id, $product->quantity);
                 $product->delete();
             }
-            return response()->json(['message' => 'El producto se ha eliminado del carrito.'], 200);
+            return response()->json(['message' => 'Los productos se han eliminado del carrito.'], 200);
         } catch (\Exception $e) {
-
-            //! mensaje de error
             return response()->json(['error' => 'Ocurrió un error al intentar actualizar el carrito.'], 500);
         }
     }
