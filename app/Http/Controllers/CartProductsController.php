@@ -236,24 +236,19 @@ class CartProductsController extends Controller
     }
 
     //todo    Metodo para remover un producto del carrito 
-    public function removeAllProductsFromCart()
-{
+    public function removeAllProductsFromCart()  
+    {
     try {
-        // Buscar los productos en el carrito para el usuario
         $productsInCart = $this->searchProductInCartByuser_id();
-
         foreach ($productsInCart as $product) {
-            // Ajustar el stock de cada producto
             $this->addStock($product->product_id, $product->quantity);
             $product->delete();
         }
         return response()->json(['message' => 'Los productos se han eliminado del carrito.'], 200);
     } catch (\Exception $e) {
-        // Manejo de errores
         return response()->json(['error' => 'Ocurrió un error al intentar actualizar el carrito.'], 500);
     }
 }
-
 
 
 }

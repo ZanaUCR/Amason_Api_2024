@@ -9,10 +9,12 @@ class product extends Model
 {
     use HasFactory;
 
-    // Agrega los atributos que se pueden llenar de forma masiva
-    protected $fillable = ['name', 'description', 'price', 'stock', 'category_id', 'id_store'];
     protected $primaryKey = 'product_id'; // Si la clave primaria es 'product_id'
 
+
+    // Agrega los atributos que se pueden llenar de forma masiva
+    protected $fillable = ['name', 'description', 'price', 'stock', 'category_id', 'id_store'];
+  
     // Relación con la categoría
     public function category()
     {
@@ -24,6 +26,9 @@ class product extends Model
     {
         return $this->hasMany(Review::class);
     }
+
+ 
+
 
     // Relación con la tienda
     public function store()
@@ -37,16 +42,17 @@ class product extends Model
         return $this->hasMany(ProductImage::class, 'product_id');
     }
 
-    // En Product.php (modelo)
-    public static function getCategoriesByProductIds($productIds)
+    public static function getAllProductsInCategory($categoryId)
     {
-        return self::whereIn('product_id', $productIds)->pluck('category_id')->unique();
+        return self::with('images')->where('category_id', $categoryId)->get();
     }
+    
+    
 
     // En Product.php (modelo)
     public static function getRecommendedProducts($categoryIds, $productIds)
     {
-        return self::whereIn('category_id', $categoryIds)
+        return self::whereIn('id', $categoryIds)
                 ->whereNotIn('product_id', $productIds)
                 ->get();
     }

@@ -66,32 +66,43 @@ Route::get('/tickets/{id}', [TicketController::class, 'show']);
 
 
 
+// middleware(['auth:sanctum'])->
+Route::get('/recommended/products/category/{categoryId}', [RecommendationController::class, 'getRecomendationByHistory']);
+Route::get('/recommended/test/products/category/{categoryId}', [RecommendationController::class, 'testProductImages']);
 
-Route::get('stores/{storeId}/top-selling-products', [ReportController::class, 'getTopSellingProductsByStore']);
+
+//Route::get('stores/{storeId}/top-selling-products', [ReportController::class, 'getTopSellingProductsByStore']);
 
 
 Route::middleware('auth:sanctum')->group(function () {
 
-Route::post('/tickets/{id}/assign', [TicketController::class, 'assignTicket']);
+//Route::post('/tickets/{id}/assign', [TicketController::class, 'assignTicket']);
 Route::post('/tickets/{ticket_id}/messages', [TicketController::class, 'addMessage']);
 
 Route::get('/tickets/{ticket_id}/messages', [TicketController::class, 'getMessages']);
+Route::Post('/assign-ticket/{id}', [TicketController::class, 'assignTicket']);
+
+Route::get('/unassigned-tickets', [TicketController::class, 'unassignedTickets']);
+Route::get('/assigned-tickets', [TicketController::class, 'assignedTickets']);
+Route::put('/tickets/{id}/close', [TicketController::class, 'closeTicket']);
+
 
 
 
 
 Route::middleware(['auth:sanctum'])->get('/products/category/{categoryId}', [RecommendationController::class, 'getCombinedProductsInCategory']);
+
 Route::middleware('auth:sanctum')->get('/recommendationByCart', [RecommendationController::class, 'getRecommendationByCart']);
-
-Route::get('/tickets/unassigned', [TicketController::class, 'unassignedTickets']);
-
 
 });
 
 
 
+
 Route::middleware('auth:sanctum')->get('/user-tickets', [TicketController::class, 'userTickets']);
-Route::get('/recommendations', [RecomendationController::class, 'getRecommendations']);
+
+//Route::get('/recommendations', [RecomendationController::class, 'getRecommendations']);
+
 
 
 // Rutas para los productos
