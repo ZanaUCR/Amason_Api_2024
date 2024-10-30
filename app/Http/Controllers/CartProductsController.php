@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\cart_products;
 use App\Models\product;
+use App\Models\category;
 use App\Http\Controllers\StockManagementController;
 
 class CartProductsController extends Controller
@@ -17,7 +18,7 @@ class CartProductsController extends Controller
         return response()->json($list); // Retornar como JSON
     }
 
-    public function showCart()
+    public function showCart(){
   
 
         $userId = auth()->id(); // Obtén el ID del usuario autenticado

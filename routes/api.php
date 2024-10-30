@@ -50,7 +50,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
 
 
-Route::get('/categorias', [CartProductsController::class, 'categoriasparagael'])->name('categories.list');
+Route::get('/category', [CartProductsController::class, 'categoriasparagael'])->name('categories.list');
 
 
 
@@ -109,12 +109,6 @@ Route::delete('/products/{id}', [ProductController::class, 'deleteProduct']);
 
 // Obtener productos por categoria 
 Route::get('/products/category/{categoryId}', [ProductController::class, 'getProductsByCategory']);
-
-    // Obtener productos por categoria 
-
-    Route::get('/categories', [CategoryController::class, 'getCategories']);
-
-
 
 // Agregar un nuevo producto (acceso sin autenticación si lo deseas)
 Route::post('/products', [ProductController::class, 'store']);
