@@ -29,10 +29,7 @@ class ReviewDeleteTest extends TestCase
      ]);
      */
 
-     // Hacer la solicitud DELETE
-
-
-     $response = $this->delete("/api/deleteReview/{$review_id}" , [
+     $response = $this->delete("/api/reviews/deleteReview/{$review_id}" , [
          'review_id' => $review_id, 
      ]);
 

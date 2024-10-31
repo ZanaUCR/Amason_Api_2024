@@ -28,7 +28,7 @@ class ReviewPublishTest extends TestCase
         $user = User::factory()->create();
         $this->actingAs($user);
 
-        $response = $this->post("/api/publishReview/{$product->id}", [
+        $response = $this->post("/api/reviews/publishReview/{$product->id}", [
             'user_id' => $user->id,
             'calification' => 4,
             'comment' => 'Great product!',
