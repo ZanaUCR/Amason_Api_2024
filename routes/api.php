@@ -128,11 +128,16 @@ Route::get('/products/category/{categoryId}', [ProductController::class, 'getPro
 Route::post('/products', [ProductController::class, 'store']);
 
 //rutas para reviews
-Route::middleware('auth:sanctum')->post('/publishReview/{product_id}', [ReviewController::class, 'publishReview']);
-Route::middleware('auth:sanctum')->put('/updateReview/{review_id}', [ReviewController::class, 'updateReview']);
-Route::middleware('auth:sanctum')->delete('/deleteReview/{review_id}', [ReviewController::class, 'deleteReview']);
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/reviews/publishReview/{product_id}', [ReviewController::class, 'publishReview']);
+    Route::put('/reviews/updateReview/{review_id}', [ReviewController::class, 'updateReview']);
+    Route::delete('/reviews/deleteReview/{review_id}', [ReviewController::class, 'deleteReview']);
+    Route::get('/reviews/showReviews/{product_id}', [ReviewController::class, 'showReviews']);
+    Route::get('/reviews/by-calification/{productId}', [ReviewController::class, 'showReviewsByCalification']);
+});
 
 Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
     return response()->json(['user' => Auth::id()]);
 });
+
 

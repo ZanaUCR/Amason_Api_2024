@@ -31,7 +31,7 @@ class ReviewUpdateTest extends TestCase
 
         $review = Review::find(2); 
 
-        $response = $this->put("/api/updateReview/{$review->id}", [
+        $response = $this->put("/api/reviews/updateReview/{$review->id}", [
             'calification' => 5,
             'comment' => 'Excellent product!',
         ]);

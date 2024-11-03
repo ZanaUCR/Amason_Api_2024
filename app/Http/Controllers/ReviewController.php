@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use App\Models\product;
 use App\Models\Review;
 
 class ReviewController extends Controller
@@ -84,13 +85,32 @@ class ReviewController extends Controller
     }
 
 
-    public function showReview(Request $request, $review_id)
+    public function showReviews($productId)
     {
-        //  
-
-        //return response()->json(['message' => 'Review updated successfully', 'review' => $review], 200);
+        $listReviews = Review::where('product_id', $productId)
+            ->select('id','product_id','comment', 'calification')
+            ->get();
+    
+        return response()->json([
+            'reviews' => $listReviews,
+            'total_reviews' => count($listReviews)
+        ]);
     }
 
+    public function showReviewsByCalification($productId)
+    {
+        $listReviews = Review::where('product_id', $productId)
+            ->where('calification', '>', 4) 
+            ->select('id', 'product_id', 'comment', 'calification')
+            ->get();
+    
+        return response()->json([
+            'reviews' => $listReviews,
+            'total_reviews' => count($listReviews)
+        ]);
+    }
+    
+    
     public function deleteReview($review_id)
     {
         $user_id = auth()->id();
