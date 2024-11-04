@@ -8,7 +8,7 @@ use App\Http\Controllers\TicketController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\CategoryController; 
 use App\Http\Controllers\CartProductsController;
-
+use App\Http\Controllers\StoreController;
 use App\Http\Controllers\RecommendationController;
 
 
@@ -129,3 +129,10 @@ Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
     return response()->json(['user' => Auth::id()]);
 });
 
+// apis de gestion de tiendas
+Route::post('/store',[StoreController::class,'createStore']);
+Route::get('/store/{sellerId}', [StoreController::class,'storesBySellerId']);
+Route::get('/store/id/{Id}', [StoreController::class,'storesById']);
+Route::delete('/store/{id}', [StoreController::class, 'deleteStore']);
+Route::patch('/store/{id}', [StoreController::class, 'updateStore']);
+//
