@@ -1,6 +1,7 @@
 <?php
 
 //use Illuminate\Http\Response;
+use App\Http\Controllers\OrderController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
@@ -47,6 +48,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/cart/removeall', [CartProductsController::class, 'removeAllProductsFromCart'])->name('cart.removeAll.product');
 });
 
+Route::get('/searchOrder/{order_id}', [OrderController::class, 'searchOrder'])->name('order.search');
 
 
 
