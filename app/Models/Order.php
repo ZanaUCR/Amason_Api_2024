@@ -15,9 +15,11 @@ protected $fillable = ['status', 'payment_method_id'];
 
     // Definir la relación con OrderItem
     public function orderItems()
+
 {
     return $this->hasMany(OrderItem::class, 'order_id', 'order_id');
 }
+
 
     public function orderTransactions()
     {
