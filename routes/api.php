@@ -53,7 +53,9 @@ Route::get('/searchOrder/{order_id}', [OrderController::class, 'searchOrder'])->
 Route::post('/finishOrder', [OrderController::class, 'finishOrder'])->name('order.finish');
 
 
+
 Route::get('/categorias', [CartProductsController::class, 'getCategories'])->name('categories.list');
+
 
 
 
@@ -69,32 +71,43 @@ Route::get('/tickets/{id}', [TicketController::class, 'show']);
 
 
 
+// middleware(['auth:sanctum'])->
+Route::middleware('auth:sanctum')->get('/recommended/products/category/{categoryId}', [RecommendationController::class, 'getRecommendationByHistory']);
+Route::get('/recommended/test/products/category/{categoryId}', [RecommendationController::class, 'testProductImages']);
 
-Route::get('stores/{storeId}/top-selling-products', [ReportController::class, 'getTopSellingProductsByStore']);
+
+//Route::get('stores/{storeId}/top-selling-products', [ReportController::class, 'getTopSellingProductsByStore']);
 
 
 Route::middleware('auth:sanctum')->group(function () {
 
-Route::post('/tickets/{id}/assign', [TicketController::class, 'assignTicket']);
+//Route::post('/tickets/{id}/assign', [TicketController::class, 'assignTicket']);
 Route::post('/tickets/{ticket_id}/messages', [TicketController::class, 'addMessage']);
 
 Route::get('/tickets/{ticket_id}/messages', [TicketController::class, 'getMessages']);
+Route::Post('/assign-ticket/{id}', [TicketController::class, 'assignTicket']);
+
+Route::get('/unassigned-tickets', [TicketController::class, 'unassignedTickets']);
+Route::get('/assigned-tickets', [TicketController::class, 'assignedTickets']);
+Route::put('/tickets/{id}/close', [TicketController::class, 'closeTicket']);
+
 
 
 
 
 Route::middleware(['auth:sanctum'])->get('/products/category/{categoryId}', [RecommendationController::class, 'getCombinedProductsInCategory']);
+
 Route::middleware('auth:sanctum')->get('/recommendationByCart', [RecommendationController::class, 'getRecommendationByCart']);
-
-Route::get('/tickets/unassigned', [TicketController::class, 'unassignedTickets']);
-
 
 });
 
 
 
+
 Route::middleware('auth:sanctum')->get('/user-tickets', [TicketController::class, 'userTickets']);
+
 Route::get('/recommendations', [RecommendationController::class, 'getRecommendations']);
+
 
 
 // Rutas para los productos
@@ -112,12 +125,6 @@ Route::delete('/products/{id}', [ProductController::class, 'deleteProduct']);
 
 // Obtener productos por categoria 
 Route::get('/products/category/{categoryId}', [ProductController::class, 'getProductsByCategory']);
-
-    // Obtener productos por categoria 
-
-    Route::get('/categories', [CategoryController::class, 'getCategories']);
-
-
 
 // Agregar un nuevo producto (acceso sin autenticación si lo deseas)
 Route::post('/products', [ProductController::class, 'store']);
