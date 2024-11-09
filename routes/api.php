@@ -5,13 +5,15 @@ use App\Http\Controllers\OrderController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\TicketController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\CategoryController; 
 use App\Http\Controllers\ReportController; 
 use App\Http\Controllers\CartProductsController;
-
+use App\Http\Controllers\StoreController;
 use App\Http\Controllers\RecommendationController;
+
 
 
 /*
@@ -41,6 +43,7 @@ Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::middleware('auth:sanctum')->post('/logout', [AuthController::class, 'logout']);
 
+
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/cart', [CartProductsController::class, 'showCart'])->name('cart.showCart'); // Se elimina el userId de la ruta
     Route::post('/cart/add', [CartProductsController::class, 'addToCart'])->name('cart.addToCart');
@@ -55,6 +58,8 @@ Route::post('/finishOrder', [OrderController::class, 'finishOrder'])->name('orde
 
 
 Route::get('/categorias', [CartProductsController::class, 'getCategories'])->name('categories.list');
+
+
 
 
 
@@ -129,8 +134,24 @@ Route::get('/products/category/{categoryId}', [ProductController::class, 'getPro
 // Agregar un nuevo producto (acceso sin autenticación si lo deseas)
 Route::post('/products', [ProductController::class, 'store']);
 
+//rutas para reviews
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/reviews/publishReview/{product_id}', [ReviewController::class, 'publishReview']);
+    Route::put('/reviews/updateReview/{review_id}', [ReviewController::class, 'updateReview']);
+    Route::delete('/reviews/deleteReview/{review_id}', [ReviewController::class, 'deleteReview']);
+    Route::get('/reviews/showReviews/{product_id}', [ReviewController::class, 'showReviews']);
+    Route::get('/reviews/by-calification/{productId}', [ReviewController::class, 'showReviewsByCalification']);
+});
 
 Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
     return response()->json(['user' => Auth::id()]);
 });
+
+// apis de gestion de tiendas
+Route::post('/store',[StoreController::class,'createStore']);
+Route::get('/store/{sellerId}', [StoreController::class,'storesBySellerId']);
+Route::get('/store/id/{Id}', [StoreController::class,'storesById']);
+Route::delete('/store/{id}', [StoreController::class, 'deleteStore']);
+Route::patch('/store/{id}', [StoreController::class, 'updateStore']);
+
 

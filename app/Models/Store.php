@@ -16,7 +16,6 @@ class Store extends Model
      */
     protected $fillable = [
         'seller_id',
-        'location_id',
         'store_name',
         'description',
         'email',
@@ -38,4 +37,5 @@ class Store extends Model
     {
         return $this->hasMany(Product::class, 'id_store');
     }
+    
 }

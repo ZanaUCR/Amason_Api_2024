@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('reviews', function (Blueprint $table) {
 
-            $table->id('review_id'); // Clave primari
+            $table->id(); // Clave primari
     
             // Foreign key a la tabla 'users'
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
