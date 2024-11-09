@@ -132,8 +132,6 @@ class CartProductsController extends Controller
         $newproductincart = new cart_products([
 
             'user_id' =>  auth()->user()->id, 
-          
-
             'product_id' => $idproducttoadd,
             'quantity' => $quantitytoadd,
         ]);
