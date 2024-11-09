@@ -50,7 +50,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
 });
 
 Route::get('/searchOrder/{order_id}', [OrderController::class, 'searchOrder'])->name('order.search');
-
+Route::post('/finishOrder', [OrderController::class, 'finishOrder'])->name('order.finish');
 
 
 Route::get('/categorias', [CartProductsController::class, 'getCategories'])->name('categories.list');

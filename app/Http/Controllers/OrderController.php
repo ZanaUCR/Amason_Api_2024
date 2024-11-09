@@ -10,26 +10,26 @@ class OrderController extends Controller
     // validatePaymentMethod()
     // finishOrder()
     public function processOrder($amount, $paymentMethod, $cardNumber = null, $securityCode = null, $cardHolderName = null)
-{
-    // Validar el método de pago
-    if ($paymentMethod === 'card') {
-        // Llamada a validateCardNumber para verificar la tarjeta
-        if ($this->validateCardNumber($cardNumber)) {
-            // Procesar el pago con tarjeta
-            // Aquí iría la lógica de procesamiento de pago, por ejemplo, llamando a un API de pasarela de pagos.
-            return response()->json(['status' => 'success', 'message' => 'Order processed with card payment.']);
-        } else {
-            // Respuesta en caso de que la tarjeta sea inválida
-            return response()->json(['status' => 'failed', 'message' => 'Invalid card number.'], 400);
+    {
+        // Validar el método de pago
+        if ($paymentMethod === 'card') {
+            // Llamada a validateCardNumber para verificar la tarjeta
+            if ($this->validateCardNumber($cardNumber)) {
+                // Procesar el pago con tarjeta
+                // Aquí iría la lógica de procesamiento de pago, por ejemplo, llamando a un API de pasarela de pagos.
+                return response()->json(['status' => 'success', 'message' => 'Order processed with card payment.']);
+            } else {
+                // Respuesta en caso de que la tarjeta sea inválida
+                return response()->json(['status' => 'failed', 'message' => 'Invalid card number.'], 400);
+            }
+        } elseif ($paymentMethod === 'paypal') {
+            // Aquí iría la lógica de procesamiento de pago con PayPal
+            return response()->json(['status' => 'success', 'message' => 'Order processed with PayPal payment.']);
         }
-    } elseif ($paymentMethod === 'paypal') {
-        // Aquí iría la lógica de procesamiento de pago con PayPal
-        return response()->json(['status' => 'success', 'message' => 'Order processed with PayPal payment.']);
-    }
 
-    // Respuesta en caso de que el método de pago no sea reconocido
-    return response()->json(['status' => 'failed', 'message' => 'Unsupported payment method.'], 400);
-}
+        // Respuesta en caso de que el método de pago no sea reconocido
+        return response()->json(['status' => 'failed', 'message' => 'Unsupported payment method.'], 400);
+    }
 
     private function validateCardNumber($cardNumber)
     {
@@ -69,17 +69,32 @@ class OrderController extends Controller
         // If the sum is a multiple of 10, the card number is valid
         return ($sum % 10) == 0;
     }
-    private function finishOrder() {
+    public function finishOrder(Request $request)
+{
+    $order_id = $request->input('order_id');
 
+    try {
+        $order = $this->searchOrder($order_id);
+        if (!$order) {
+            return response()->json(['status' => 'failed', 'message' => 'Order not found.'], 404);
+        }
+        
+        $order->status = 3;
+        $order->save();
 
+        return response()->json(['status' => 'success', 'message' => 'Order finished.']);
 
-
+    } catch (\Exception $e) {
+        return response()->json(['status' => 'failed', 'message' => $e->getMessage()], 500);
     }
+}
+
 
     public function searchOrder($order_id)
     {
-       // $order = Order::where('user_id', auth()->user()->id)->where('order_id', $order_id)->first();
-       $order = Order::where('user_id', 1)->where('order_id', $order_id)->first();
+       
+        // $order = Order::where('user_id', auth()->user()->id)->where('order_id', $order_id)->first();
+        $order = Order::where('user_id', 1)->where('order_id', $order_id)->first();
         return $order;
     }
 
