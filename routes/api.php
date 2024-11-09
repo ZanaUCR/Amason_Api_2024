@@ -8,6 +8,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\TicketController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\CategoryController; 
+use App\Http\Controllers\ReportController; 
 use App\Http\Controllers\CartProductsController;
 
 use App\Http\Controllers\RecommendationController;
@@ -93,7 +94,7 @@ Route::get('/tickets/unassigned', [TicketController::class, 'unassignedTickets']
 
 
 Route::middleware('auth:sanctum')->get('/user-tickets', [TicketController::class, 'userTickets']);
-Route::get('/recommendations', [RecomendationController::class, 'getRecommendations']);
+Route::get('/recommendations', [RecommendationController::class, 'getRecommendations']);
 
 
 // Rutas para los productos
