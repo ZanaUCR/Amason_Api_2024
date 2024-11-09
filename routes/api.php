@@ -1,6 +1,7 @@
 <?php
 
 //use Illuminate\Http\Response;
+use App\Http\Controllers\OrderController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
@@ -8,6 +9,7 @@ use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\TicketController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\CategoryController; 
+use App\Http\Controllers\ReportController; 
 use App\Http\Controllers\CartProductsController;
 use App\Http\Controllers\StoreController;
 use App\Http\Controllers\RecommendationController;
@@ -50,9 +52,14 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/cart/removeall', [CartProductsController::class, 'removeAllProductsFromCart'])->name('cart.removeAll.product');
 });
 
+Route::get('/searchOrder/{order_id}', [OrderController::class, 'searchOrder'])->name('order.search');
+Route::post('/finishOrder', [OrderController::class, 'finishOrder'])->name('order.finish');
 
 
-Route::get('/category', [CartProductsController::class, 'categoriasparagael'])->name('categories.list');
+
+Route::get('/categorias', [CartProductsController::class, 'getCategories'])->name('categories.list');
+
+
 
 
 
@@ -104,7 +111,7 @@ Route::middleware('auth:sanctum')->get('/recommendationByCart', [RecommendationC
 
 Route::middleware('auth:sanctum')->get('/user-tickets', [TicketController::class, 'userTickets']);
 
-//Route::get('/recommendations', [RecomendationController::class, 'getRecommendations']);
+Route::get('/recommendations', [RecommendationController::class, 'getRecommendations']);
 
 
 

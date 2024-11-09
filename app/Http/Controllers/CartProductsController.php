@@ -10,7 +10,9 @@ use App\Http\Controllers\StockManagementController;
 
 class CartProductsController extends Controller
 {
-    public function categoriasparagael()
+
+    public function getCategories()
+
 
     {
         $list = category::all(); // Asegúrate de usar el nombre correcto del modelo
@@ -168,8 +170,6 @@ class CartProductsController extends Controller
         $newproductincart = new cart_products([
 
             'user_id' =>  auth()->user()->id, 
-          
-
             'product_id' => $idproducttoadd,
             'quantity' => $quantitytoadd,
         ]);
