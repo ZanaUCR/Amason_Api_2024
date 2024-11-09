@@ -9,13 +9,16 @@ class Review extends Model
 {
     use HasFactory;
 
-      // Relación con el modelo User
+    protected $fillable = ['user_id','product_id','calification','comment','review_date',];
+
+    protected $casts = ['review_date' => 'datetime',];
+
       public function user()
       {
           return $this->belongsTo(User::class);
       }
   
-      // Relación con el modelo Product
+
       public function product()
       {
           return $this->belongsTo(Product::class);
