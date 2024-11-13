@@ -61,8 +61,8 @@ class OrderController extends Controller
 
     public function searchOrder($order_id)
     {
-        // $order = Order::where('user_id', auth()->user()->id)->where('order_id', $order_id)->first();
-        $order = Order::where('user_id', 1)->where('order_id', $order_id)->first();
+         $order = Order::where('user_id', auth()->user()->id)->where('order_id', $order_id)->first();
+       // $order = Order::where('user_id', 1)->where('order_id', $order_id)->first();
         return $order;
     }
 
