@@ -28,6 +28,10 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'address', // Añade este atributo
+        'city',    // Añade este atributo
+        'postal_code', // Añade este atributo
+        'country',     // Añade este atributo
     ];
 
     /**

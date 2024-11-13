@@ -13,6 +13,7 @@ class OrderController extends Controller
     // finishOrder()
     public function processOrder(Request $request)
     {
+        
         $order_id = $request->input('order_id');
         $amount = $request->input('amount');
 
@@ -21,6 +22,10 @@ class OrderController extends Controller
         $securityCode = $request->input('securityCode', null);
         $cardHolderName = $request->input('cardHolderName', null);
 
+        $deliveryInfoRequest = new Request();
+        $deliveryInfoResponse = app(UserController::class)->getDeliveryInformation($deliveryInfoRequest);
+        $deliveryInfo = $deliveryInfoResponse->getData();
+
         if (!$this->validateCardNumber($cardNumber)) {
             return response()->json(['status' => 'failed', 'message' => 'Invalid card number.'], 400);
         } else {
@@ -28,6 +33,7 @@ class OrderController extends Controller
             return $this->finishOrder($finishOrderRequest);
         }
     }
+
 
     public function validateCardNumber($cardNumber)
     {
