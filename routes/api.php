@@ -50,6 +50,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/cart/update-units', [CartProductsController::class, 'updateUnits'])->name('cart.update.units');
     Route::post('/cart/remove-product', [CartProductsController::class, 'removeProductFromCart'])->name('cart.remove.product');
     Route::post('/cart/removeall', [CartProductsController::class, 'removeAllProductsFromCart'])->name('cart.removeAll.product');
+    Route::post('/order/process', [OrderController::class, 'processOrder'])->name('order.process');
 });
 
 Route::get('/searchOrder/{order_id}', [OrderController::class, 'searchOrder'])->name('order.search');

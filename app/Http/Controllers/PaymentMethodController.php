@@ -8,7 +8,7 @@ class PaymentMethodController extends Controller
 {
     private function validateCardNumber($cardNumber)
     {
-        // Remove any non-digit characters (like spaces or hyphens) to ensure a clean number
+        
         $cardNumber = preg_replace('/\D/', '', $cardNumber);
 
         // Check that the number contains only digits and is between 13 and 19 digits long
