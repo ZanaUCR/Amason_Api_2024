@@ -36,6 +36,10 @@ class OrderController extends Controller
         'order_id' => $orderInProgress->order_id,
         'payment_method_id' => $paymentMethodId,
     ]);
+    $deliveryInfoRequest = new Request();
+    $deliveryInfoResponse = app(UserController::class)->getDeliveryInformation($deliveryInfoRequest);
+    $deliveryInfo = $deliveryInfoResponse->getData();
+
 
     return $this->finishOrder($finishOrderRequest);
 }
