@@ -28,7 +28,7 @@ class OrderController extends Controller
     $paymentMethodId = $paymentMethod === 'card' ? 1 : ($paymentMethod === 'paypal' ? 2 : null);
 
     if ($paymentMethod === 'card' && !$this->validateCardNumber($request->input('cardNumber', null))) {
-        return response()->json(['status' => 'failed', 'message' => 'Invalid card number.'], 400);
+        return response()->json(['status' => 'failed', 'message' => 'Invalid card number.'], 4000);
     }
 
     $orderInProgress = $this->searchPendingOrderByUser();
@@ -47,13 +47,15 @@ class OrderController extends Controller
 
     public function createOrder(Request $request)
 {
+    
     $validated = $request->validate([
         'user_id' => 'required|exists:users,id',
-        'status' => 'required|integer'
+        'status' => 'required|integer' // 1 proceso 2 finalizado 3 cancelado
     ]);
 
-    $cartProducts = $this->searchProductInCartByuser_id();
 
+    $cartProducts = $this->searchProductInCartByuser_id();
+   
     if ($cartProducts->isEmpty()) {
         return response()->json(['status' => 'failed', 'message' => 'No products in the cart.'], 400);
     }
@@ -64,16 +66,20 @@ class OrderController extends Controller
         $totalAmount += $product->price * $cartProduct->quantity;
     }
 
-    $order = new Order([
-        'user_id' => $validated['user_id'],
-        'status' => $validated['status'],
-        'total_amount' => $totalAmount
-    ]);
+    $id = $validated['user_id'];
+
+    $order = new Order(
+        [
+            'user_id' => $validate['user_id'],
+            'status' => $validated['status'],
+            'total_amount' => $totalAmount,
+        ]);
 
     $order->save();
 
     foreach ($cartProducts as $cartProduct) {
         $product = $this->searchProduct($cartProduct->product_id);
+
 
         $orderItem = new OrderItem([
             'product_id' => $product->product_id,
@@ -123,7 +129,7 @@ class OrderController extends Controller
             $order->payment_method_id = $request->input('payment_method_id');
             $order->save();
 
-            return response()->json(['status' => 'success', 'message' => 'Order finished.']);
+            return response()->json(['status' => 'success', 'message' => 'Order finished.'], 200);
 
         } catch (\Exception $e) {
             return response()->json(['status' => 'failed', 'message' => $e->getMessage()], 500);

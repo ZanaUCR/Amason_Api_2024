@@ -58,14 +58,15 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/searchOrder/{order_id}', [OrderController::class, 'searchOrder'])->name('order.search');
     Route::post('/order/finish', [OrderController::class, 'finishOrder'])->name('order.finish');
     Route::post('/order/create', [OrderController::class, 'createOrder']);
+    Route::get('/cart/products', [OrderController::class, 'searchProductInCartByuser_id']);
 });
 
 // Ruta para pruebas
-Route::post('/order/create', [OrderController::class, 'createOrder']);
+// Route::post('/order/create', [OrderController::class, 'createOrder']);
 Route::post('/order/process', [OrderController::class, 'processOrder']);
 Route::post('/order/finish', [OrderController::class, 'finishOrder']);
 Route::get('/product/{product_id}', [OrderController::class, 'searchProduct']);
-Route::get('/cart/products', [OrderController::class, 'searchProductInCartByuser_id']);
+
 Route::post('/payment/validate-card', [PaymentMethodController::class, 'validateCardNumber']);
 Route::get('/order/{order_id}', [OrderController::class, 'searchOrder']);
 Route::get('/order/pending', [OrderController::class, 'searchPendingOrderByUser']);
