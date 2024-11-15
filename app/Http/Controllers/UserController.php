@@ -18,6 +18,7 @@ class UserController extends Controller
             'address' => $user->address,
             'city' => $user->city,
             'postal_code' => $user->postal_code,
+            'number' => $user->number,
             'country' => $user->country
         ];
 
@@ -35,6 +36,7 @@ class UserController extends Controller
             'address' => 'required|string',
             'city' => 'required|string',
             'postal_code' => 'required|string',
+            'number' => 'required|string',
             'country' => 'required|string'
         ]);
 
