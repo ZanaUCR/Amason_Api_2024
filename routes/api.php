@@ -14,6 +14,7 @@ use App\Http\Controllers\CartProductsController;
 use App\Http\Controllers\PaymentMethodController;
 use App\Http\Controllers\StoreController;
 use App\Http\Controllers\RecommendationController;
+use App\Http\Controllers\UserController;
 
 
 
@@ -51,6 +52,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/cart/update-units', [CartProductsController::class, 'updateUnits'])->name('cart.update.units');
     Route::post('/cart/remove-product', [CartProductsController::class, 'removeProductFromCart'])->name('cart.remove.product');
     Route::post('/cart/removeall', [CartProductsController::class, 'removeAllProductsFromCart'])->name('cart.removeAll.product');
+    Route::get('/deliveryInformation', [UserController::class, 'getDeliveryInformation'])->name('deliveryInformation.get');
+    Route::put('/deliveryInformation', [UserController::class, 'updateDeliveryInformation'])->name('deliveryInformation.update');
     Route::post('/order/process', [OrderController::class, 'processOrder'])->name('order.process');
     Route::get('/searchOrder/{order_id}', [OrderController::class, 'searchOrder'])->name('order.search');
     Route::post('/order/finish', [OrderController::class, 'finishOrder'])->name('order.finish');
