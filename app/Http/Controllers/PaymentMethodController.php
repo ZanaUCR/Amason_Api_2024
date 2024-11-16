@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 
 class PaymentMethodController extends Controller
 {
-    private function validateCardNumber($cardNumber)
+    public function validateCardNumber($cardNumber)
     {
         $cardNumber = preg_replace('/\D/', '', $cardNumber);
 

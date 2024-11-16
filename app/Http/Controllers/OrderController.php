@@ -28,7 +28,7 @@ class OrderController extends Controller
     $paymentMethodId = $paymentMethod === 'card' ? 1 : ($paymentMethod === 'paypal' ? 2 : null);
 
     if ($paymentMethod === 'card' && !$this->validateCardNumber($request->input('cardNumber', null))) {
-        return response()->json(['status' => 'failed', 'message' => 'Invalid card number.'], 4000);
+        return response()->json(['status' => 'failed', 'message' => 'Invalid card number.'], 400);
     }
 
     $orderInProgress = $this->searchPendingOrderByUser();
@@ -66,11 +66,9 @@ class OrderController extends Controller
         $totalAmount += $product->price * $cartProduct->quantity;
     }
 
-    $id = $validated['user_id'];
-
     $order = new Order(
         [
-            'user_id' => $validate['user_id'],
+            'user_id' => $validated['user_id'],
             'status' => $validated['status'],
             'total_amount' => $totalAmount,
         ]);

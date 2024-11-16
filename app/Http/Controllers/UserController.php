@@ -14,7 +14,7 @@ class UserController extends Controller
     
         // Verificar si el usuario tiene la información de entrega necesaria
         if (!$user->address || !$user->city || !$user->postal_code || !$user->country) {
-            return response()->json(['error' => 'Información de entrega incompleta'], 400);
+            return response()->json(['error' => 'Información de entrega vacía'], 400);
         }
     
         // Obtener la información de la dirección de entrega directamente desde el modelo User
