@@ -11,7 +11,7 @@ class PaymentMethod extends Model
 
     protected $table = 'payment_method';
 
-    // Definir la relación con Transaction
+    
 
     public function order()
     {

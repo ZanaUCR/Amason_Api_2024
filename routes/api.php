@@ -8,11 +8,13 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\TicketController;
 use App\Http\Controllers\ProductController;
-use App\Http\Controllers\CategoryController; 
-use App\Http\Controllers\ReportController; 
+use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\CartProductsController;
+use App\Http\Controllers\PaymentMethodController;
 use App\Http\Controllers\StoreController;
 use App\Http\Controllers\RecommendationController;
+use App\Http\Controllers\UserController;
 
 
 
@@ -50,15 +52,31 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/cart/update-units', [CartProductsController::class, 'updateUnits'])->name('cart.update.units');
     Route::post('/cart/remove-product', [CartProductsController::class, 'removeProductFromCart'])->name('cart.remove.product');
     Route::post('/cart/removeall', [CartProductsController::class, 'removeAllProductsFromCart'])->name('cart.removeAll.product');
+    Route::get('/deliveryInformation', [UserController::class, 'getDeliveryInformation'])->name('deliveryInformation.get');
+    Route::put('/deliveryInformation', [UserController::class, 'updateDeliveryInformation'])->name('deliveryInformation.update');
     Route::post('/order/process', [OrderController::class, 'processOrder'])->name('order.process');
+    Route::get('/searchOrder/{order_id}', [OrderController::class, 'searchOrder'])->name('order.search');
+    Route::post('/order/finish', [OrderController::class, 'finishOrder'])->name('order.finish');
+    Route::post('/order/create', [OrderController::class, 'createOrder']);
+    Route::get('/cart/products', [OrderController::class, 'searchProductInCartByuser_id']);
+    Route::get('/order/pending', [OrderController::class, 'searchPendingOrderByUser']);
+    Route::post('/order/process', [OrderController::class, 'processOrder']);
 });
 
-Route::get('/searchOrder/{order_id}', [OrderController::class, 'searchOrder'])->name('order.search');
-Route::post('/finishOrder', [OrderController::class, 'finishOrder'])->name('order.finish');
+// Ruta para pruebas
+// Route::post('/order/create', [OrderController::class, 'createOrder']);
+
+Route::post('/order/finish', [OrderController::class, 'finishOrder']);
+Route::get('/product/{product_id}', [OrderController::class, 'searchProduct']);
+
+Route::post('/payment/validate-card', [PaymentMethodController::class, 'validateCardNumber']);
+Route::get('/order/{order_id}', [OrderController::class, 'searchOrder']);
 
 
 
 Route::get('/categorias', [CartProductsController::class, 'getCategories'])->name('categories.list');
+
+
 
 
 
@@ -87,23 +105,23 @@ Route::get('/recommended/test/products/category/{categoryId}', [RecommendationCo
 
 Route::middleware('auth:sanctum')->group(function () {
 
-//Route::post('/tickets/{id}/assign', [TicketController::class, 'assignTicket']);
-Route::post('/tickets/{ticket_id}/messages', [TicketController::class, 'addMessage']);
+    //Route::post('/tickets/{id}/assign', [TicketController::class, 'assignTicket']);
+    Route::post('/tickets/{ticket_id}/messages', [TicketController::class, 'addMessage']);
 
-Route::get('/tickets/{ticket_id}/messages', [TicketController::class, 'getMessages']);
-Route::Post('/assign-ticket/{id}', [TicketController::class, 'assignTicket']);
+    Route::get('/tickets/{ticket_id}/messages', [TicketController::class, 'getMessages']);
+    Route::Post('/assign-ticket/{id}', [TicketController::class, 'assignTicket']);
 
-Route::get('/unassigned-tickets', [TicketController::class, 'unassignedTickets']);
-Route::get('/assigned-tickets', [TicketController::class, 'assignedTickets']);
-Route::put('/tickets/{id}/close', [TicketController::class, 'closeTicket']);
-
-
+    Route::get('/unassigned-tickets', [TicketController::class, 'unassignedTickets']);
+    Route::get('/assigned-tickets', [TicketController::class, 'assignedTickets']);
+    Route::put('/tickets/{id}/close', [TicketController::class, 'closeTicket']);
 
 
 
-Route::middleware(['auth:sanctum'])->get('/products/category/{categoryId}', [RecommendationController::class, 'getCombinedProductsInCategory']);
 
-Route::middleware('auth:sanctum')->get('/recommendationByCart', [RecommendationController::class, 'getRecommendationByCart']);
+
+    Route::middleware(['auth:sanctum'])->get('/products/category/{categoryId}', [RecommendationController::class, 'getCombinedProductsInCategory']);
+
+    Route::middleware('auth:sanctum')->get('/recommendationByCart', [RecommendationController::class, 'getRecommendationByCart']);
 
 });
 
@@ -149,9 +167,9 @@ Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
 });
 
 // apis de gestion de tiendas
-Route::post('/store',[StoreController::class,'createStore']);
-Route::get('/store/{sellerId}', [StoreController::class,'storesBySellerId']);
-Route::get('/store/id/{Id}', [StoreController::class,'storesById']);
+Route::post('/store', [StoreController::class, 'createStore']);
+Route::get('/store/{sellerId}', [StoreController::class, 'storesBySellerId']);
+Route::get('/store/id/{Id}', [StoreController::class, 'storesById']);
 Route::delete('/store/{id}', [StoreController::class, 'deleteStore']);
 Route::patch('/store/{id}', [StoreController::class, 'updateStore']);
 
