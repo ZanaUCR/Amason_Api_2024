@@ -9,7 +9,7 @@ class Order extends Model
 {
     use HasFactory;
     protected $primaryKey = 'order_id';
-protected $fillable = ['status', 'payment_method_id'];
+protected $fillable = ['user_id','total_amount','status', 'payment_method_id'];
     protected $table = 'orders';
 
 

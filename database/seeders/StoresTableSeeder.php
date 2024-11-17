@@ -12,11 +12,11 @@ class StoresTableSeeder extends Seeder
     {
         DB::table('stores')->insert([
             'seller_id' => 1,
-            'location_id' => null,
+            // 'location_id' => null,
             'store_name' => 'TechWorld Store',
             'description' => 'A store that sells high-quality electronics and gadgets.',
             'email' => 'techworld@example.com',
-            'logo' => 'https://i.imgur.com/TechWorldLogo.png',
+            // 'logo' => 'https://i.imgur.com/TechWorldLogo.png',
             'created_at' => Carbon::now(),
             'updated_at' => Carbon::now(),
         ]);

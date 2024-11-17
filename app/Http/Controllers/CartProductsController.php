@@ -150,8 +150,6 @@ class CartProductsController extends Controller
     public function searchProductInCartByuser_id()
     {
 
-
-
         $productincart = cart_products::where('user_id', auth()->user()->id)->get();
       
 
