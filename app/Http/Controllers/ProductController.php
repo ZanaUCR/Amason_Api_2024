@@ -59,6 +59,9 @@ public function store(Request $request)
     if ($validator->fails()) {
         return response()->json(['message' => 'Falló la validación', 'errors' => $validator->errors()], 400);
     }
+    if ($validator->fails()) {
+        return response()->json(['message' => 'Falló la validación', 'errors' => $validator->errors()], 400);
+    }
 
     // Crear el producto
     try {
