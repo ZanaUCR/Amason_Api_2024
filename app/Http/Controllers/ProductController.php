@@ -22,7 +22,10 @@ class ProductController extends Controller
 
     // Asignar la primera imagen o una imagen por defecto y agregar el nombre de la categoría
     $products->each(function ($product) {
-        $product->image = $product->images->first()->image_path ?? 'default_image_path';
+        $product->image = $product->images->first() 
+        ? asset('storage/' . $product->images->first()->image_path) 
+        : asset('default_image_path');
+    
         $product->category_name = $product->category->name ?? 'Categoría desconocida'; // Añadir el nombre de la categoría
         unset($product->images);  // Remover las imágenes del resultado
         unset($product->category);  // Remover los detalles de la categoría
@@ -43,8 +46,7 @@ public function store(Request $request)
         'stock' => 'required|integer|min:1',
         'category_id' => 'required|exists:categories,id',
         'id_store' => 'required|exists:stores,id',
-        'image_links' => 'sometimes|array', // Aceptamos un array de links de imágenes
-        'image_links.*' => 'sometimes|url' // Cada link debe ser una URL válida
+        'images.*' => 'nullable|file|mimes:jpg,png,jpeg|max:2048', // Validación para múltiples imágenes
     ], [
         'name.required' => 'El nombre del producto es obligatorio.',
         'description.required' => 'La descripción es obligatoria.',
@@ -74,17 +76,23 @@ public function store(Request $request)
             'id_store' => $request->id_store,
         ]);
 
-        // Si el producto fue creado correctamente, agregar las imágenes
-        if ($product && $request->has('image_links')) {
-            $this->addProductImages($product->product_id, $request->image_links);  // Usamos product_id
+       // Si se suben imágenes, procesarlas
+       if ($request->hasFile('images')) {
+        foreach ($request->file('images') as $image) {
+            $filePath = $image->store('products_images', 'public'); // Guardar en el almacenamiento público
+            ProductImage::create([
+                'product_id' => $product->product_id,
+                'image_path' => $filePath,
+            ]);
         }
-
-        return response()->json(['message' => 'Producto creado con éxito'], 201);
-    } catch (\Exception $e) {
-        // Capturar cualquier excepción y retornar un mensaje
-        return response()->json(['error' => 'Error al crear el producto', 'details' => $e->getMessage()], 500);
     }
+
+    return response()->json(['message' => 'Producto creado con éxito', 'product' => $product], 201);
+} catch (\Exception $e) {
+    return response()->json(['error' => 'Error al crear el producto', 'details' => $e->getMessage()], 500);
 }
+}
+
 
 // Método para agregar las imágenes a la tabla product_images
 private function addProductImages($productId, $imageLinks)
@@ -99,20 +107,33 @@ private function addProductImages($productId, $imageLinks)
     }
 }
 
+public function uploadImage(Request $request)
+{
+    // Validar el archivo
+    $request->validate([
+        'image' => 'required|file|mimes:jpg,jpeg,png|max:2048', // Máximo 2MB
+    ]);
+
+    try {
+        // Almacenar la imagen en el almacenamiento público
+        $filePath = $request->file('image')->store('products_images', 'public');
+
+        // Retornar la ruta de la imagen
+        return response()->json(['url' => Storage::url($filePath)], 201);
+    } catch (\Exception $e) {
+        return response()->json(['error' => 'Error al subir la imagen', 'details' => $e->getMessage()], 500);
+    }
+}
 
 public function editProduct(Request $request, $id)
 {
-    $product = Product::findOrFail($id);
-
-    // Validar los datos de la actualización
+    // Validar los datos entrantes
     $validator = Validator::make($request->all(), [
-        'name' => 'sometimes|required|string|max:255',
-        'description' => 'sometimes|required|string|max:1000',
-        'price' => 'sometimes|required|numeric|min:0',
-        'stock' => 'sometimes|required|integer|min:1',
-        'category_id' => 'sometimes|required|exists:categories,id',
-        'image_links' => 'sometimes|array', // Para los enlaces de imágenes
-        'image_links.*' => 'sometimes|url', // Validar que los enlaces sean URLs válidas
+        'name' => 'nullable|string|max:255',
+        'description' => 'nullable|string|max:1000',
+        'price' => 'nullable|numeric|min:0',
+        'stock' => 'nullable|integer|min:1',
+        'category_id' => 'nullable|exists:categories,id',
     ]);
 
     if ($validator->fails()) {
@@ -120,41 +141,54 @@ public function editProduct(Request $request, $id)
     }
 
     try {
-        // Actualizar el producto con los datos validados
+        // Encontrar y actualizar el producto
+        $product = Product::findOrFail($id);
         $product->update($validator->validated());
 
-        // Llamar al método separado si se han proporcionado nuevos enlaces de imágenes
-        if ($request->has('image_links')) {
-            $this->updateProductImages($product, $request->image_links);
-        }
+        return response()->json(['message' => 'Producto actualizado con éxito', 'product' => $product], 200);
 
-        // Cargar nuevamente las imágenes y la categoría para devolver al frontend
-        $updatedProduct = $product->load(['images', 'category']);
-
-        return response()->json(['message' => 'Producto actualizado con éxito', 'product' => $updatedProduct], 200);
     } catch (\Exception $e) {
         return response()->json(['error' => 'Error al actualizar el producto', 'details' => $e->getMessage()], 500);
     }
 }
 
-// Método para actualizar enlaces de imágenes
-public function updateProductImages($product, $imageLinks)
+public function updateProductImages(Request $request, $id)
 {
-    // Verificar si hay imágenes existentes y eliminarlas
-    if ($product->images()->exists()) {
-        $product->images()->delete(); // Eliminar las imágenes anteriores
+    $product = Product::findOrFail($id);
+
+    // Validar las imágenes
+    $validator = Validator::make($request->all(), [
+        'images.*' => 'required|file|mimes:jpg,png,jpeg|max:2048', // Validar imágenes
+    ]);
+
+    if ($validator->fails()) {
+        return response()->json(['errors' => $validator->errors()], 400);
     }
 
-    // Guardar los nuevos enlaces de imágenes
-    foreach ($imageLinks as $link) {
-        ProductImage::create([
-            'product_id' => $product->product_id, // Asegurarse de usar product_id
-            'image_path' => $link,
-        ]);
+    try {
+        // Eliminar imágenes existentes
+        foreach ($product->images as $image) {
+            Storage::disk('public')->delete($image->image_path);
+            $image->delete();
+        }
+
+        // Guardar nuevas imágenes
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $image) {
+                $filePath = $image->store('products_images', 'public');
+                ProductImage::create([
+                    'product_id' => $product->product_id,
+                    'image_path' => $filePath,
+                ]);
+            }
+        }
+
+        return response()->json(['message' => 'Imágenes actualizadas con éxito'], 200);
+
+    } catch (\Exception $e) {
+        return response()->json(['error' => 'Error al actualizar las imágenes', 'details' => $e->getMessage()], 500);
     }
 }
-
-
 
 
     public function deleteProduct($product_id)
@@ -167,7 +201,6 @@ public function updateProductImages($product, $imageLinks)
             Storage::disk('public')->delete($image->image_path);
             $image->delete();
         }
-    
         // Eliminar el producto
         $product->delete();
     
