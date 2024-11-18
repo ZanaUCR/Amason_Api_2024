@@ -74,7 +74,7 @@ Route::get('/order/{order_id}', [OrderController::class, 'searchOrder']);
 
 
 
-Route::get('/categorias', [CartProductsController::class, 'getCategories'])->name('categories.list');
+Route::get('/categories', [CartProductsController::class, 'getCategories'])->name('categories.list');
 
 
 
