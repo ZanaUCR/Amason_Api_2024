@@ -14,26 +14,35 @@ class ProductController extends Controller
 {
     // Obtener productos por tienda
     public function getProductsByStore($storeId)
-{
-    $products = Product::where('id_store', $storeId)
-        ->with('images', 'category') // Incluir la categoría en la consulta
-        ->select('product_id', 'name', 'price', 'category_id', 'description', 'stock')
-        ->get();
-
-    // Asignar la primera imagen o una imagen por defecto y agregar el nombre de la categoría
-    $products->each(function ($product) {
-        $product->image = $product->images->first() 
-        ? asset('storage/' . $product->images->first()->image_path) 
-        : asset('default_image_path');
+    {
+        $products = Product::where('id_store', $storeId)
+            ->with('images', 'category') // Incluir la categoría en la consulta
+            ->select('product_id', 'name', 'price', 'category_id', 'description', 'stock')
+            ->get();
     
-        $product->category_name = $product->category->name ?? 'Categoría desconocida'; // Añadir el nombre de la categoría
-        unset($product->images);  // Remover las imágenes del resultado
-        unset($product->category);  // Remover los detalles de la categoría
-    });
-
-    return response()->json($products, 200);
-}
- 
+        // Asignar la primera imagen o una imagen por defecto y agregar el nombre de la categoría
+        $products->each(function ($product) {
+            if ($product->images->first()) {
+                $imagePath = $product->images->first()->image_path;
+    
+                // Verificar si el image_path ya es un enlace completo
+                if (filter_var($imagePath, FILTER_VALIDATE_URL)) {
+                    $product->image = $imagePath; // Usar directamente si es una URL
+                } else {
+                    $product->image = asset('storage/' . $imagePath); // Generar la URL si no es completa
+                }
+            } else {
+                $product->image = asset('default_image_path'); // Cambia 'default_image_path' a la ruta real de la imagen por defecto
+            }
+    
+            $product->category_name = $product->category->name ?? 'Categoría desconocida'; // Añadir el nombre de la categoría
+            unset($product->images);  // Remover las imágenes del resultado
+            unset($product->category);  // Remover los detalles de la categoría
+        });
+    
+        return response()->json($products, 200);
+    }
+    
 
 // Agregar un nuevo producto
 public function store(Request $request)
@@ -210,20 +219,34 @@ public function updateProductImages(Request $request, $id)
 
     
     public function getProductsByCategory($categoryId)
-{
-    // Obtener todos los productos que pertenecen a la categoría especificada
-    $products = Product::where('category_id', $categoryId)
-        ->with('images') // Obtener imágenes si las tienes relacionadas
-        ->get();
-
-    // Asignar la primera imagen o una imagen por defecto
-    $products->each(function ($product) {
-        $product->image = $product->images->first()->image_path ?? 'default_image_path';
-        unset($product->images);  // Remover las imágenes del resultado
-    });
-
-    return response()->json($products, 200);
-}
+    {
+        // Obtener todos los productos que pertenecen a la categoría especificada
+        $products = Product::where('category_id', $categoryId)
+            ->with('images') // Obtener imágenes si las tienes relacionadas
+            ->get();
+    
+        // Asignar la primera imagen con URL completa o una imagen por defecto
+        $products->each(function ($product) {
+            if ($product->images->first()) {
+                $imagePath = $product->images->first()->image_path;
+    
+                // Verificar si el image_path ya es un enlace completo
+                if (filter_var($imagePath, FILTER_VALIDATE_URL)) {
+                    $product->image = $imagePath; // Usar directamente si es una URL
+                } else {
+                    $product->image = asset('storage/' . $imagePath); // Generar la URL si no es completa
+                }
+            } else {
+                $product->image = asset('default_image_path'); // Cambia 'default_image_path' a la ruta real de la imagen por defecto
+            }
+    
+            unset($product->images); // Remover las imágenes del resultado
+        });
+    
+        return response()->json($products, 200);
+    }
+    
+    
 
 
 
