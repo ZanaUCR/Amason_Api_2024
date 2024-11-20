@@ -87,7 +87,7 @@ class OrderController extends Controller
         ]);
 
         $orderItem->save();
-        $cartProduct->delete();
+        
     }
 
     return response()->json(['status' => 'success', 'order_id' => $order->order_id, 'total_amount' => $totalAmount]);
