@@ -115,10 +115,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/assigned-tickets', [TicketController::class, 'assignedTickets']);
     Route::put('/tickets/{id}/close', [TicketController::class, 'closeTicket']);
 
-
-
-
-
     Route::middleware(['auth:sanctum'])->get('/products/category/{categoryId}', [RecommendationController::class, 'getCombinedProductsInCategory']);
 
     Route::middleware('auth:sanctum')->get('/recommendationByCart', [RecommendationController::class, 'getRecommendationByCart']);
@@ -132,10 +128,9 @@ Route::middleware('auth:sanctum')->get('/user-tickets', [TicketController::class
 
 Route::get('/recommendations', [RecommendationController::class, 'getRecommendations']);
 
-
-
 // Rutas para los productos
 
+Route::post('/upload-image', [ProductController::class, 'uploadImage']);
 
 
 // Obtener productos por tienda
@@ -143,7 +138,7 @@ Route::get('/products/store/{storeId}', [ProductController::class, 'getProductsB
 
 // Editar un producto
 Route::put('/products/{id}', [ProductController::class, 'editProduct']);
-
+Route::post('/products/{id}/images', [ProductController::class, 'updateProductImages']); // Para imágenes
 // Eliminar un producto
 Route::delete('/products/{id}', [ProductController::class, 'deleteProduct']);
 
