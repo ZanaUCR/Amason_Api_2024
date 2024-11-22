@@ -18,9 +18,22 @@ class UserTableSeeder extends Seeder
              'updated_at' => now(),
          ]);
 
+         DB::table('users')->insert([
+            'name' => 'Pruebin',
+             'email' => 'prueba@gmail.com',
+             'password' => Hash::make('12345678'), // Asegúrate de usar un hash para la contraseña
+             'created_at' => now(),
+             'updated_at' => now(),
+         ]);
+
         DB::table('role_user')->insert([
             'role_id' => 3,
             'user_id' => 1,
+        ]);
+
+        DB::table('role_user')->insert([
+            'role_id' => 1,
+            'user_id' => 2,
         ]);
     }
    
