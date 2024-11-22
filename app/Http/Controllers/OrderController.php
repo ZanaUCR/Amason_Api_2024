@@ -87,7 +87,7 @@ class OrderController extends Controller
         ]);
 
         $orderItem->save();
-        $cartProduct->delete();
+        //$cartProduct->delete();
     }
 
     return response()->json(['status' => 'success', 'order_id' => $order->order_id, 'total_amount' => $totalAmount]);
@@ -134,6 +134,25 @@ class OrderController extends Controller
         }
     }
 
+    public function cancelOrder(Request $request)
+    {
+        $order_id = $request->input('order_id');
+
+        try {
+            $order = $this->searchOrder($order_id);
+            if (!$order) {
+                return response()->json(['status' => 'failed', 'message' => 'Order not found.'], 404);
+            }
+
+            $order->status = 3;
+            $order->save();
+
+            return response()->json(['status' => 'success', 'message' => 'Order cancelled.'], 200);
+
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'failed', 'message' => $e->getMessage()], 500);
+        }
+    }
 
     public function searchOrder($order_id)
     {
