@@ -137,9 +137,9 @@ class OrderController extends Controller
     public function cancelOrder(Request $request)
     {
         $order_id = $request->input('order_id');
-
+        $user_id = $request->input('user_id');
         try {
-            $order = $this->searchOrder($order_id);
+            $order = $this->searchOrderCancel($order_id, $user_id);
             if (!$order) {
                 return response()->json(['status' => 'failed', 'message' => 'Order not found.'], 404);
             }
@@ -157,6 +157,13 @@ class OrderController extends Controller
     public function searchOrder($order_id)
     {
         $order = Order::where('user_id', auth()->user()->id)->where('order_id', $order_id)->first();
+        // $order = Order::where('user_id', 1)->where('order_id', $order_id)->first();
+        return $order;
+    }
+
+    public function searchOrderCancel($order_id, $user_id)
+    {
+        $order = Order::where('user_id', $user_id)->where('order_id', $order_id)->first();
         // $order = Order::where('user_id', 1)->where('order_id', $order_id)->first();
         return $order;
     }
