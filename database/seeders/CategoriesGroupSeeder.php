@@ -14,6 +14,7 @@ class CategoriesGroupSeeder extends Seeder
             StoresTableSeeder::class,
             ProductsTableSeeder::class,
             ProductImagesTableSeeder::class,
+            PaymentMethodSeeder::class,
         ]);
     }
 }
