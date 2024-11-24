@@ -100,7 +100,8 @@ Route::middleware('auth:sanctum')->get('/recommended/products/category/{category
 Route::get('/recommended/test/products/category/{categoryId}', [RecommendationController::class, 'testProductImages']);
 
 
-//Route::get('stores/{storeId}/top-selling-products', [ReportController::class, 'getTopSellingProductsByStore']);
+Route::get('stores/{storeId}/top-selling-products', [ReportController::class, 'getTopSellingProductsByStore']);
+Route::get('stores/{storeId}/top-selling-products-pdf', [ReportController::class, 'exportTopSellingProductsPdf']);
 
 
 Route::middleware('auth:sanctum')->group(function () {
