@@ -131,6 +131,9 @@ Route::get('/recommendations', [RecommendationController::class, 'getRecommendat
 
 // Rutas para los productos
 
+
+Route::get('/products/search', [ProductController::class, 'searchProducts']);
+
 Route::post('/upload-image', [ProductController::class, 'uploadImage']);
 
 

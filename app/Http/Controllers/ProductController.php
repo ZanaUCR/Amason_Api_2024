@@ -246,7 +246,42 @@ public function updateProductImages(Request $request, $id)
         return response()->json($products, 200);
     }
     
+
+
+
     
+    public function searchProducts(Request $request)
+{
+    $query = Product::query();
+
+    // Filtrar por nombre (si se proporciona)
+    if ($request->has('name') && !empty($request->name)) {
+        $query->where('name', 'LIKE', '%' . $request->name . '%');
+    }
+
+    // Filtrar por categoría (si se proporciona)
+    if ($request->has('category_id') && !empty($request->category_id)) {
+        $query->where('category_id', $request->category_id);
+    }
+
+    // Incluir imágenes y categorías
+    $products = $query->with('images', 'category')
+        ->select('product_id', 'name', 'price', 'category_id', 'description', 'stock')
+        ->get();
+
+    // Formatear los resultados (incluir imágenes)
+    $products->each(function ($product) {
+        $product->image = $product->images->first() 
+            ? asset('storage/' . $product->images->first()->image_path)
+            : asset('default_image_path');
+
+        $product->category_name = $product->category->name ?? 'Categoría desconocida';
+        unset($product->images, $product->category);
+    });
+
+    return response()->json($products, 200);
+}
+
 
 
 
