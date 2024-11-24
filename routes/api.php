@@ -60,12 +60,13 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/order/create', [OrderController::class, 'createOrder']);
     Route::get('/cart/products', [OrderController::class, 'searchProductInCartByuser_id']);
     Route::get('/order/pending', [OrderController::class, 'searchPendingOrderByUser']);
-    Route::post('/order/process', [OrderController::class, 'processOrder']);
+    
+
 });
 
 // Ruta para pruebas
 // Route::post('/order/create', [OrderController::class, 'createOrder']);
-
+Route::post('/order/cancel', [OrderController::class, 'cancelOrder']);
 Route::post('/order/finish', [OrderController::class, 'finishOrder']);
 Route::get('/product/{product_id}', [OrderController::class, 'searchProduct']);
 
