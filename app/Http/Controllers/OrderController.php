@@ -24,8 +24,13 @@ class OrderController extends Controller
     // finishOrder()
     public function processOrder(Request $request)
     {
-        $paymentMethod = $request->input('paymentMethod');
-        $paymentMethodId = $paymentMethod === 'card' ? 1 : ($paymentMethod === 'paypal' ? 2 : null);
+    $paymentMethod = $request->input('paymentMethod');
+    $paymentMethodId = $paymentMethod === 'card' ? 1 : ($paymentMethod === 'paypal' ? 2 : null);
+
+    if ($paymentMethod === 'card' && !$this->validateCardNumber($request->input('cardNumber', null))) {
+        return response()->json(['status' => 'failed', 'message' => 'Numero de tarjeta inválido.'], 400);
+    }
+
 
         if ($paymentMethod === 'card' && !$this->validateCardNumber($request->input('cardNumber', null))) {
             return response()->json(['status' => 'failed', 'message' => 'Invalid card number.'], 400);
