@@ -442,5 +442,24 @@ public function deleteVariation(Request $request, $productId)
     }
 }
 
+public function getVariations($productId)
+{
+    try {
+        // Encontrar el producto por ID
+        $product = Product::findOrFail($productId);
+
+        // Decodificar las variaciones existentes
+        $variations = json_decode($product->variation, true) ?? [];
+
+        return response()->json($variations, 200);
+    } catch (\Exception $e) {
+        return response()->json([
+            'error' => 'Error al obtener las variaciones',
+            'details' => $e->getMessage(),
+        ], 500);
+    }
+}
+
+
 
 }

@@ -177,3 +177,4 @@ Route::patch('/store/{id}', [StoreController::class, 'updateStore']);
 Route::post('/products/{productId}/variation', [ProductController::class, 'createVariation']);
 Route::put('/products/{productId}/variation', [ProductController::class, 'updateVariation']);
 Route::delete('/products/{productId}/variation', [ProductController::class, 'deleteVariation']);
+Route::get('/products/{productId}/variation', [ProductController::class, 'getVariations']);
