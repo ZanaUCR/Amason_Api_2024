@@ -30,13 +30,18 @@ class CartProductsController extends Controller
         // Agregando productos con detalles como nombre y precio
         $quantityofproductsincart = count($listcartproducts);
         foreach ($listcartproducts as $cartproduct) {
-            $product = Product::where('product_id', $cartproduct->product_id)->firstOrFail();
+         //   $product = Product::where('product_id', $cartproduct->product_id)->firstOrFail();
+         $product = $this->searchProduct($cartproduct->product_id);
             $cartproduct->product_name = $product->name;
             $cartproduct->product_price = $product->price;
             $cartproduct->product_description = $product->description;
             $cartproduct->stock = $product->stock;
+            $cartproduct->discount = $product->discount;
+            $cartproduct->total = $product->price * $cartproduct->quantity;
+            $cartproduct->discount_amount = $cartproduct->total * $product->discount / 100;
+            $cartproduct->total_with_discount = $cartproduct->total - ($cartproduct->total * $product->discount / 100);
             $cartproduct->product_image = $product->images->first()->image_path ?? 'default_image_path';
-            $totalamount += $product->price * $cartproduct->quantity;
+            $totalamount += $cartproduct->total_with_discount;
         }
     
         return response()->json([
@@ -75,7 +80,8 @@ class CartProductsController extends Controller
             $productincart = $this->searchProductInCart($idproducttoadd);
 
             //*validar que haya stock del producto
-            $stock = $this->searchProductsStock($idproducttoadd);
+            //!se cambia la logica de un metodo
+          $stock = $this->searchProduct($idproducttoadd)->stock;
             $quantity = $quantitytoadd;
 
             //* se verifica si hay mas stock del que se agrega
@@ -156,20 +162,25 @@ class CartProductsController extends Controller
         return $productincart;
     }
 
-    public function searchProductsStock($idproducttoadd)
+    public function searchProduct($idproducttoadd)
     {
         $product = Product::where('product_id', $idproducttoadd)->firstOrFail();
 
-        return $product->stock;
+        return $product;
     }
 
     public function addProductToCart($idproducttoadd, $quantitytoadd)
     {
+
+
+      $product =  $this->searchProduct($idproducttoadd);
+
         $newproductincart = new cart_products([
 
             'user_id' =>  auth()->user()->id, 
             'product_id' => $idproducttoadd,
             'quantity' => $quantitytoadd,
+            'discount' => $product->discount,
         ]);
 
         $newproductincart->save();
