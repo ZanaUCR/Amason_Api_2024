@@ -60,6 +60,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/order/create', [OrderController::class, 'createOrder']);
     Route::get('/cart/products', [OrderController::class, 'searchProductInCartByuser_id']);
     Route::get('/order/pending', [OrderController::class, 'searchPendingOrderByUser']);
+    Route::get('/orders/user-history', [OrderController::class, 'getAllOrdersByUser']);
     
 
 });
@@ -97,8 +98,9 @@ Route::get('/tickets/{id}', [TicketController::class, 'show']);
 
 
 // middleware(['auth:sanctum'])->
-Route::middleware('auth:sanctum')->get('/recommended/products/category/{categoryId}', [RecommendationController::class, 'getRecommendationByHistory']);
+Route::get('/recommended/products/category/{categoryId}', [RecommendationController::class, 'getRecommendationByHistory']);
 Route::get('/recommended/test/products/category/{categoryId}', [RecommendationController::class, 'testProductImages']);
+Route::get('/recommended/tending/products', [RecommendationController::class, 'getTendingProducts']);
 
 
 Route::get('stores/{storeId}/top-selling-products', [ReportController::class, 'getTopSellingProductsByStore']);
@@ -131,6 +133,9 @@ Route::middleware('auth:sanctum')->get('/user-tickets', [TicketController::class
 Route::get('/recommendations', [RecommendationController::class, 'getRecommendations']);
 
 // Rutas para los productos
+
+
+Route::get('/products/search', [ProductController::class, 'searchProducts']);
 
 Route::post('/upload-image', [ProductController::class, 'uploadImage']);
 

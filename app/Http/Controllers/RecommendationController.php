@@ -13,6 +13,7 @@ use App\Models\OrderItem;
 use App\Models\Category;
 use App\Models\PaymentMethod;
 use App\Models\cart_products;
+use Illuminate\Support\Facades\DB;
 
 class RecommendationController extends Controller
 {
@@ -42,6 +43,7 @@ public function getRecommendationByHistory($categoryId)
 {
     // $user =  ;// Obtiene el usuario autenticado
     $user =  Auth::user();// Obtiene el usuario autenticado
+    $user = User::find(10); // O el ID del usuario que quieras
 
     // Obtener los productos comprados en la categoría especificada
     $purchasedProducts = $user->getPurchasedProductsInCategory($categoryId);
@@ -93,7 +95,27 @@ public function testProductImages($categoryId)
     ]);
 }
 
+public function getTendingProducts( )
+{
+        // Subconsulta para calcular el total_quantity
+    $subquery = DB::table('order_items')
+    ->select('product_id', DB::raw('SUM(quantity) AS total_quantity'))
+    ->groupBy('product_id')
+    ->orderByDesc('total_quantity');
 
+    // Consulta principal
+    $results = DB::table(DB::raw("({$subquery->toSql()}) as b"))
+    ->mergeBindings($subquery) // Vincula las variables del subquery
+    ->join('products as v', 'b.product_id', '=', 'v.product_id')
+    ->join('product_images as pi', 'b.product_id', '=', 'pi.product_id')
+    ->select('b.product_id', 'b.total_quantity', 'v.*', 'pi.image_path')
+    ->orderByDesc('b.total_quantity')
+    ->limit(20)
+    ->get();
+
+    return response()->json($results);
+
+}
 
 
 
