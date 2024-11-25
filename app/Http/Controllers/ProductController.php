@@ -284,6 +284,163 @@ public function updateProductImages(Request $request, $id)
 
 
 
+public function createVariation(Request $request, $productId)
+{
+    // Validar los datos de entrada
+    $validator = Validator::make($request->all(), [
+        'type' => 'required|string|max:255',
+        'options' => 'required|array|min:1',
+        'options.*' => 'string|max:255',
+    ], [
+        'type.required' => 'El tipo de variación es obligatorio.',
+        'options.required' => 'Debe proporcionar al menos una opción para la variación.',
+        'options.array' => 'Las opciones deben enviarse como un arreglo.',
+    ]);
+
+    // Manejar errores de validación
+    if ($validator->fails()) {
+        return response()->json(['errors' => $validator->errors()], 400);
+    }
+
+    try {
+        // Encontrar el producto por ID
+        $product = Product::findOrFail($productId);
+
+        // Decodificar las variaciones existentes o inicializar un arreglo vacío
+        $variation = json_decode($product->variation, true) ?? [];
+
+        // Agregar la nueva variación
+        $variation[] = [
+            'type' => $request->type,
+            'options' => $request->options,
+        ];
+
+        // Actualizar el campo de variaciones en formato JSON
+        $product->variation = json_encode($variation, JSON_UNESCAPED_UNICODE);
+        $product->save();
+
+        return response()->json([
+            'message' => 'Variación agregada con éxito',
+            'product' => $product,
+            'variation' => $variation,
+        ], 200);
+    } catch (\Exception $e) {
+        return response()->json([
+            'error' => 'Error al agregar la variación',
+            'details' => $e->getMessage(),
+        ], 500);
+    }
+}
+
+
+public function updateVariation(Request $request, $productId)
+{
+    // Validar los datos de entrada
+    $validator = Validator::make($request->all(), [
+        'type' => 'required|string|max:255',
+        'options' => 'required|array|min:1',
+        'options.*' => 'string|max:255',
+    ], [
+        'type.required' => 'El tipo de variación es obligatorio.',
+        'options.required' => 'Debe proporcionar al menos una opción para la variación.',
+        'options.array' => 'Las opciones deben enviarse como un arreglo.',
+    ]);
+
+    // Manejar errores de validación
+    if ($validator->fails()) {
+        return response()->json(['errors' => $validator->errors()], 400);
+    }
+
+    try {
+        // Encontrar el producto por ID
+        $product = Product::findOrFail($productId);
+
+        // Decodificar las variaciones existentes
+        $variations = json_decode($product->variation, true) ?? [];
+
+        // Buscar la variación por su tipo
+        $found = false;
+        foreach ($variations as &$variation) {
+            if ($variation['type'] === $request->type) {
+                // Actualizar las opciones de la variación encontrada
+                $variation['options'] = $request->options;
+                $found = true;
+                break;
+            }
+        }
+
+        if (!$found) {
+            return response()->json([
+                'error' => 'No se encontró una variación con el tipo especificado.',
+            ], 404);
+        }
+
+        // Guardar las variaciones actualizadas
+        $product->variation = json_encode($variations, JSON_UNESCAPED_UNICODE);
+        $product->save();
+
+        return response()->json([
+            'message' => 'Variación actualizada con éxito',
+            'product' => $product,
+            'variation' => $variations,
+        ], 200);
+    } catch (\Exception $e) {
+        return response()->json([
+            'error' => 'Error al actualizar la variación',
+            'details' => $e->getMessage(),
+        ], 500);
+    }
+}
+
+public function deleteVariation(Request $request, $productId)
+{
+    // Validar los datos de entrada
+    $validator = Validator::make($request->all(), [
+        'type' => 'required|string|max:255',
+    ], [
+        'type.required' => 'El tipo de variación es obligatorio.',
+    ]);
+
+    // Manejar errores de validación
+    if ($validator->fails()) {
+        return response()->json(['errors' => $validator->errors()], 400);
+    }
+
+    try {
+        // Encontrar el producto por ID
+        $product = Product::findOrFail($productId);
+
+        // Decodificar las variaciones existentes
+        $variations = json_decode($product->variation, true) ?? [];
+
+        // Filtrar las variaciones para eliminar la que coincide con el tipo
+        $updatedVariations = array_filter($variations, function ($variation) use ($request) {
+            return $variation['type'] !== $request->type;
+        });
+
+        // Verificar si se eliminó alguna variación
+        if (count($variations) === count($updatedVariations)) {
+            return response()->json([
+                'error' => 'No se encontró una variación con el tipo especificado.',
+            ], 404);
+        }
+
+        // Guardar las variaciones actualizadas
+        $product->variation = json_encode(array_values($updatedVariations), JSON_UNESCAPED_UNICODE);
+        $product->save();
+
+        return response()->json([
+            'message' => 'Variación eliminada con éxito',
+            'product' => $product,
+            'variations' => $updatedVariations,
+        ], 200);
+    } catch (\Exception $e) {
+        return response()->json([
+            'error' => 'Error al eliminar la variación',
+            'details' => $e->getMessage(),
+        ], 500);
+    }
+}
 
 
 }

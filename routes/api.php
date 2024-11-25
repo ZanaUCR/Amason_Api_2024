@@ -173,4 +173,7 @@ Route::get('/store/id/{Id}', [StoreController::class, 'storesById']);
 Route::delete('/store/{id}', [StoreController::class, 'deleteStore']);
 Route::patch('/store/{id}', [StoreController::class, 'updateStore']);
 
-
+//apis de gestion de variantes
+Route::post('/products/{productId}/variation', [ProductController::class, 'createVariation']);
+Route::put('/products/{productId}/variation', [ProductController::class, 'updateVariation']);
+Route::delete('/products/{productId}/variation', [ProductController::class, 'deleteVariation']);
