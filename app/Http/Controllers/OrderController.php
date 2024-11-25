@@ -28,7 +28,7 @@ class OrderController extends Controller
     $paymentMethodId = $paymentMethod === 'card' ? 1 : ($paymentMethod === 'paypal' ? 2 : null);
 
     if ($paymentMethod === 'card' && !$this->validateCardNumber($request->input('cardNumber', null))) {
-        return response()->json(['status' => 'failed', 'message' => 'Invalid card number.'], 400);
+        return response()->json(['status' => 'failed', 'message' => 'Numero de tarjeta inválido.'], 400);
     }
 
     $orderInProgress = $this->searchPendingOrderByUser();
