@@ -12,11 +12,6 @@ class UserController extends Controller
     {
         $user = auth()->user(); 
     
-        // Verificar si el usuario tiene la información de entrega necesaria
-        if (!$user->address || !$user->city || !$user->postal_code || !$user->country) {
-            return response()->json(['error' => 'Información de entrega vacía'], 404);
-        }
-    
         // Obtener la información de la dirección de entrega directamente desde el modelo User
         $deliveryInfo = [
             'name' => $user->name,

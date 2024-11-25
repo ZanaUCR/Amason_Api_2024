@@ -60,6 +60,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/order/create', [OrderController::class, 'createOrder']);
     Route::get('/cart/products', [OrderController::class, 'searchProductInCartByuser_id']);
     Route::get('/order/pending', [OrderController::class, 'searchPendingOrderByUser']);
+    Route::get('/orders/user-history', [OrderController::class, 'getAllOrdersByUser']);
     
 
 });
