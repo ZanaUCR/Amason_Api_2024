@@ -64,4 +64,6 @@ class StockManagementController extends Controller
     {
         return product::where('product_id', $productId)->firstOrFail();
     }
+
+    
 }
