@@ -47,6 +47,15 @@ class OrderController extends Controller
         ]);
 
 
+    public function createOrder(Request $request)
+{
+    
+    $validated = $request->validate([
+        'user_id' => 'required|exists:users,id',
+        'status' => 'required|integer' // 1 proceso 2 finalizado 3 cancelado 4 devuelto
+    ]);
+
+
 
 
         return $this->finishOrder($finishOrderRequest);
@@ -201,5 +210,38 @@ class OrderController extends Controller
         }
     }
 
+    public function updateOrderStatus(Request $request)
+    {
+        try {
+            $validated = $request->validate([
+                'order_id' => 'required|exists:orders,order_id',
+                'status' => 'required|integer|in:1,2,3,4'
+            ]);
+
+            $order = $this->searchOrder($validated['order_id']);
+            
+            if (!$order) {
+                return response()->json([
+                    'status' => 'failed', 
+                    'message' => 'Orden no encontrada o no pertenece al usuario.'
+                ], 404);
+            }
+
+            $order->status = $validated['status'];
+            $order->save();
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Estado de la orden actualizado correctamente.',
+                'order' => $order
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'failed',
+                'message' => 'Error al actualizar el estado de la orden: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 
 }

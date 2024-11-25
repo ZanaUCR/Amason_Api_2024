@@ -98,8 +98,9 @@ Route::get('/tickets/{id}', [TicketController::class, 'show']);
 
 
 // middleware(['auth:sanctum'])->
-Route::middleware('auth:sanctum')->get('/recommended/products/category/{categoryId}', [RecommendationController::class, 'getRecommendationByHistory']);
+Route::get('/recommended/products/category/{categoryId}', [RecommendationController::class, 'getRecommendationByHistory']);
 Route::get('/recommended/test/products/category/{categoryId}', [RecommendationController::class, 'testProductImages']);
+Route::get('/recommended/tending/products', [RecommendationController::class, 'getTendingProducts']);
 
 
 //Route::get('stores/{storeId}/top-selling-products', [ReportController::class, 'getTopSellingProductsByStore']);
@@ -117,10 +118,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/assigned-tickets', [TicketController::class, 'assignedTickets']);
     Route::put('/tickets/{id}/close', [TicketController::class, 'closeTicket']);
 
-
-
-
-
     Route::middleware(['auth:sanctum'])->get('/products/category/{categoryId}', [RecommendationController::class, 'getCombinedProductsInCategory']);
 
     Route::middleware('auth:sanctum')->get('/recommendationByCart', [RecommendationController::class, 'getRecommendationByCart']);
@@ -134,10 +131,12 @@ Route::middleware('auth:sanctum')->get('/user-tickets', [TicketController::class
 
 Route::get('/recommendations', [RecommendationController::class, 'getRecommendations']);
 
-
-
 // Rutas para los productos
 
+
+Route::get('/products/search', [ProductController::class, 'searchProducts']);
+
+Route::post('/upload-image', [ProductController::class, 'uploadImage']);
 
 
 // Obtener productos por tienda
@@ -145,7 +144,7 @@ Route::get('/products/store/{storeId}', [ProductController::class, 'getProductsB
 
 // Editar un producto
 Route::put('/products/{id}', [ProductController::class, 'editProduct']);
-
+Route::post('/products/{id}/images', [ProductController::class, 'updateProductImages']); // Para imágenes
 // Eliminar un producto
 Route::delete('/products/{id}', [ProductController::class, 'deleteProduct']);
 
