@@ -45,7 +45,7 @@ class OrderController extends Controller
             'order_id' => $orderInProgress->order_id,
             'payment_method_id' => $paymentMethodId,
         ]);
-
+    }
 
     public function createOrder(Request $request)
 {
