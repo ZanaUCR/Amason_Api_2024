@@ -17,7 +17,7 @@ class ProductController extends Controller
     {
         $products = Product::where('id_store', $storeId)
             ->with('images', 'category') // Incluir la categoría en la consulta
-            ->select('product_id', 'name', 'price', 'category_id', 'description', 'stock')
+            ->select('product_id', 'name', 'price', 'category_id', 'description', 'stock', 'discount')
             ->get();
     
         // Asignar la primera imagen o una imagen por defecto y agregar el nombre de la categoría
@@ -55,7 +55,8 @@ public function store(Request $request)
         'stock' => 'required|integer|min:1',
         'category_id' => 'required|exists:categories,id',
         'id_store' => 'required|exists:stores,id',
-        'images.*' => 'nullable|file|mimes:jpg,png,jpeg|max:2048', // Validación para múltiples imágenes
+        'discount' => 'nullable|numeric|min:0|max:100', // Validación para el descuento
+        'images.*' => 'nullable|file|mimes:jpg,png,jpeg|max:2048',
     ], [
         'name.required' => 'El nombre del producto es obligatorio.',
         'description.required' => 'La descripción es obligatoria.',
@@ -63,19 +64,18 @@ public function store(Request $request)
         'stock.required' => 'El stock es obligatorio.',
         'category_id.required' => 'La categoría es obligatoria.',
         'id_store.required' => 'La tienda es obligatoria.',
-        'image_links.*.url' => 'Cada link de imagen debe ser una URL válida.',
+        'discount.numeric' => 'El descuento debe ser un número.',
+        'discount.min' => 'El descuento no puede ser menor a 0.',
+        'discount.max' => 'El descuento no puede ser mayor a 100.',
     ]);
 
     // Si la validación falla, retornar errores
     if ($validator->fails()) {
         return response()->json(['message' => 'Falló la validación', 'errors' => $validator->errors()], 400);
     }
-    if ($validator->fails()) {
-        return response()->json(['message' => 'Falló la validación', 'errors' => $validator->errors()], 400);
-    }
 
-    // Crear el producto
     try {
+        // Crear el producto con discount = 0 si no se proporciona
         $product = Product::create([
             'name' => $request->name,
             'description' => $request->description,
@@ -83,24 +83,26 @@ public function store(Request $request)
             'stock' => $request->stock,
             'category_id' => $request->category_id,
             'id_store' => $request->id_store,
+            'discount' => $request->discount ?? 0, // Asignar 0 por defecto si no se envía
         ]);
 
-       // Si se suben imágenes, procesarlas
-       if ($request->hasFile('images')) {
-        foreach ($request->file('images') as $image) {
-            $filePath = $image->store('products_images', 'public'); // Guardar en el almacenamiento público
-            ProductImage::create([
-                'product_id' => $product->product_id,
-                'image_path' => $filePath,
-            ]);
+        // Procesar imágenes (si las hay)
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $image) {
+                $filePath = $image->store('products_images', 'public');
+                ProductImage::create([
+                    'product_id' => $product->product_id,
+                    'image_path' => $filePath,
+                ]);
+            }
         }
-    }
 
-    return response()->json(['message' => 'Producto creado con éxito', 'product' => $product], 201);
-} catch (\Exception $e) {
-    return response()->json(['error' => 'Error al crear el producto', 'details' => $e->getMessage()], 500);
+        return response()->json(['message' => 'Producto creado con éxito', 'product' => $product], 201);
+    } catch (\Exception $e) {
+        return response()->json(['error' => 'Error al crear el producto', 'details' => $e->getMessage()], 500);
+    }
 }
-}
+
 
 
 // Método para agregar las imágenes a la tabla product_images
@@ -143,6 +145,11 @@ public function editProduct(Request $request, $id)
         'price' => 'nullable|numeric|min:0',
         'stock' => 'nullable|integer|min:1',
         'category_id' => 'nullable|exists:categories,id',
+        'discount' => 'nullable|numeric|min:0|max:100', // Validación para el descuento
+    ], [
+        'discount.numeric' => 'El descuento debe ser un número.',
+        'discount.min' => 'El descuento no puede ser menor a 0.',
+        'discount.max' => 'El descuento no puede ser mayor a 100.',
     ]);
 
     if ($validator->fails()) {
@@ -155,11 +162,11 @@ public function editProduct(Request $request, $id)
         $product->update($validator->validated());
 
         return response()->json(['message' => 'Producto actualizado con éxito', 'product' => $product], 200);
-
     } catch (\Exception $e) {
         return response()->json(['error' => 'Error al actualizar el producto', 'details' => $e->getMessage()], 500);
     }
 }
+
 
 public function updateProductImages(Request $request, $id)
 {
