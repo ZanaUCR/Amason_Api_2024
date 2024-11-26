@@ -20,11 +20,9 @@ class StoreFactory extends Factory
     {
         return [
             'seller_id' => User::factory(),  // Crea un usuario de prueba y asigna su id como seller_id
-            'location_id' => $this->faker->optional()->randomNumber(),  // Genera un número aleatorio o nulo
             'store_name' => $this->faker->company(),  // Nombre de la tienda
             'description' => $this->faker->optional()->paragraph(),  // Descripción opcional
             'email' => $this->faker->unique()->safeEmail(),  // Email único de la tienda
-            'logo' => $this->faker->optional()->imageUrl(200, 200, 'business', true, 'logo'),  // URL de logo opcional
             'created_at' => now(),
             'updated_at' => now(),
         ];

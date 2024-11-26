@@ -45,21 +45,9 @@ class OrderController extends Controller
             'order_id' => $orderInProgress->order_id,
             'payment_method_id' => $paymentMethodId,
         ]);
-
-
-    public function createOrder(Request $request)
-{
-    
-    $validated = $request->validate([
-        'user_id' => 'required|exists:users,id',
-        'status' => 'required|integer' // 1 proceso 2 finalizado 3 cancelado 4 devuelto
-    ]);
-
-
-
-
-        return $this->finishOrder($finishOrderRequest);
     }
+
+
 
 
     public function createOrder(Request $request)
@@ -108,8 +96,10 @@ class OrderController extends Controller
             //$cartProduct->delete();
         }
 
-        return response()->json(['status' => 'success', 'order_id' => $order->order_id, 'total_amount' => $totalAmount]);
+        return
+         response()->json(['status' => 'success', 'order_id' => $order->order_id, 'total_amount' => $totalAmount]);
     }
+    
 
 
     public function searchProduct($product_id)

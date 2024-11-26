@@ -40,7 +40,11 @@ protected $fillable = ['user_id','total_amount','status', 'payment_method_id'];
     public function orders() {
         return $this->hasMany(Order::class);
     }
-    
+
+    public function orderReturns()
+    {
+        return $this->hasMany(OrderReturn::class);
+    }
 
 
     
