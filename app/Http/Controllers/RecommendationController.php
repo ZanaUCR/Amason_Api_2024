@@ -35,7 +35,18 @@ class RecommendationController extends Controller
         return response()->json($recommendedProducts, 200);
     }
     
+    public function getRecommendationByDiscount(Request $request)
+    {
+        // Consultar productos con descuento mayor a 0 e incluir las imágenes relacionadas
+    $productos = Product::where('discount', '>', 0)
+    ->with('images') // Incluir las imágenes relacionadas
+    ->orderBy('discount', 'desc') // Opcional: Ordenar por mayor descuento
+    ->get();
 
+    // Formatear la respuesta en JSON
+    return response()->json($productos, 200);
+
+    }
 
 
 
