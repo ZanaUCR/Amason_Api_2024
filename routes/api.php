@@ -121,10 +121,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::middleware(['auth:sanctum'])->get('/products/category/{categoryId}', [RecommendationController::class, 'getCombinedProductsInCategory']);
 
     Route::middleware('auth:sanctum')->get('/recommendationByCart', [RecommendationController::class, 'getRecommendationByCart']);
+    
 
 });
 
-
+Route::get('/recommendationByDiscount', [RecommendationController::class, 'getRecommendationByDiscount']);
 
 
 Route::middleware('auth:sanctum')->get('/user-tickets', [TicketController::class, 'userTickets']);
