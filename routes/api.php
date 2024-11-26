@@ -10,6 +10,7 @@ use App\Http\Controllers\TicketController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\OrderReturnController;
 use App\Http\Controllers\CartProductsController;
 use App\Http\Controllers\PaymentMethodController;
 use App\Http\Controllers\StoreController;
@@ -71,6 +72,13 @@ Route::post('/order/cancel', [OrderController::class, 'cancelOrder']);
 Route::post('/order/finish', [OrderController::class, 'finishOrder']);
 Route::get('/product/{product_id}', [OrderController::class, 'searchProduct']);
 
+Route::middleware(['auth:sanctum'])->group(function () {
+    Route::post('/order-return', [OrderReturnController::class, 'store'])->name('orderReturn.store');
+    Route::put('/order-return/{id}', [OrderReturnController::class, 'update'])->name('orderReturn.update');
+    Route::delete('/order-return/{id}', [OrderReturnController::class, 'destroy'])->name('orderReturn.destroy');
+    Route::get('/order-returns', [OrderReturnController::class, 'getAllReturns'])->name('orderReturn.getAll');
+});
+
 Route::post('/payment/validate-card', [PaymentMethodController::class, 'validateCardNumber']);
 Route::get('/order/{order_id}', [OrderController::class, 'searchOrder']);
 
@@ -122,10 +130,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::middleware(['auth:sanctum'])->get('/products/category/{categoryId}', [RecommendationController::class, 'getCombinedProductsInCategory']);
 
     Route::middleware('auth:sanctum')->get('/recommendationByCart', [RecommendationController::class, 'getRecommendationByCart']);
+    
 
 });
 
-
+Route::get('/recommendationByDiscount', [RecommendationController::class, 'getRecommendationByDiscount']);
 
 
 Route::middleware('auth:sanctum')->get('/user-tickets', [TicketController::class, 'userTickets']);

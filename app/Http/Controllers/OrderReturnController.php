@@ -39,42 +39,48 @@ class OrderReturnController extends Controller
             ], 404);
         }
     }
-
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'order_id' => 'required|exists:orders,order_id',
-            'reason' => 'required|string|min:10'
-        ]);
-
-        $order = Order::where('order_id', $validated['order_id'])
-            ->where('user_id', auth()->user()->id)
-            ->first();
-
-        if (!$order || $order->status != 2) {
+        try {
+            $validated = $request->validate([
+                'order_id' => 'required|exists:orders,order_id',
+                'reason' => 'required|string|min:10'
+            ]);
+    
+            $order = Order::where('order_id', $validated['order_id'])
+                ->where('user_id', auth()->user()->id)
+                ->first();
+    
+            if (!$order || $order->status != 2) {
+                return response()->json([
+                    'status' => 'failed',
+                    'message' => 'Orden no válida para devolución.'
+                ], 400);
+            }
+    
+            $return = OrderReturn::create([
+                'order_id' => $order->order_id,
+                'user_id' => auth()->user()->id,
+                'status' => 'pending',
+                'reason' => $validated['reason'],
+                'date' => now()
+            ]);
+    
+            $order->status = 4; // Cambiar el estado de la orden a "en proceso de devolución"
+            $order->save();
+    
             return response()->json([
-                'status' => 'failed',
-                'message' => 'Orden no válida para devolución.'
-            ], 400);
+                'status' => 'success',
+                'message' => 'Solicitud de devolución creada.',
+                'return' => $return
+            ], 201);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Error al procesar la solicitud de devolución: ' . $e->getMessage()
+            ], 500);
         }
-
-        $return = OrderReturn::create([
-            'order_id' => $order->order_id,
-            'user_id' => auth()->user()->id,
-            'status' => 'pending',
-            'reason' => $validated['reason']
-        ]);
-
-        $order->status = 4; // Cambiar el estado de la orden a "en proceso de devolución"
-        $order->save();
-
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Solicitud de devolución creada.',
-            'return' => $return
-        ], 201);
     }
-
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
@@ -105,4 +111,21 @@ class OrderReturnController extends Controller
             'message' => 'Devolución eliminada.'
         ]);
     }
+
+public function getAllReturns()
+{
+    try {
+        $returns = OrderReturn::all();
+
+        return response()->json([
+            'status' => 'success',
+            'returns' => $returns
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'status' => 'error',
+            'message' => 'Error al obtener las devoluciones: ' . $e->getMessage()
+        ], 500);
+    }
+}
 }

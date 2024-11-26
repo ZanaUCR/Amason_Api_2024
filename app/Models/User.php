@@ -109,5 +109,10 @@ public static function getUserById($id)
     return self::findOrFail($id); // Aquí manejamos la consulta específica
 }
 
+    // Relación con las devoluciones de pedidos
+    public function orderReturns()
+    {
+        return $this->hasMany(OrderReturn::class);
+    }
 
 }

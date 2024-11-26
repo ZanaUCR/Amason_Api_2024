@@ -9,6 +9,7 @@ class OrderReturn extends Model
 {
     use HasFactory;
     protected $fillable = [
+        'date',
         'return_date',
         'status',
         'reason',
