@@ -11,19 +11,15 @@ use App\Models\Review;
 class ReviewController extends Controller
 {
 
-    public function publishReview(Request $request, $product_id)
+    public function publishReview(Request $request)
     {
-
         $request->validate([
-            'user_id' => 'required|integer',
             'calification' => 'required|integer|min:1|max:5',
             'comment' => 'required|string|max:200',
         ]);
-        $user = auth()->user();
-
         $review = Review::create([
-            'user_id' => $user->id,
-            'product_id' => $product_id,
+            'user_id' => 1,
+            'product_id' => $request->product_id,
             'calification' => $request->calification,
             'comment' => $request->comment,
             'review_date' => Carbon::now(),
@@ -88,29 +84,42 @@ class ReviewController extends Controller
     public function showReviews($productId)
     {
         $listReviews = Review::where('product_id', $productId)
-            ->select('id','product_id','comment', 'calification')
+            ->with('user:id,name') // Carga solo el id y el nombre del usuario
+            ->select('id', 'product_id', 'comment', 'calification', 'created_at', 'user_id')
             ->get();
-    
+        $listReviews = $listReviews->map(function ($review) {
+            return [
+                'id' => $review->id,
+                'product_id' => $review->product_id,
+                'comment' => $review->comment,
+                'calification' => $review->calification,
+                'created_at' => $review->created_at,
+                'user_name' => $review->user->name ?? 'Usuario desconocido', // Solo el nombre
+            ];
+        });
+
+        return response()->json([
+            'reviews' => $listReviews,
+            'total_reviews' => $listReviews->count()
+        ]);
+    }
+
+
+
+    public function showReviewsByCalification($productId)
+    {
+        $listReviews = Review::where('product_id', $productId)
+            ->where('calification', '>', 4)
+            ->select('id', 'product_id', 'comment', 'calification')
+            ->get();
+
         return response()->json([
             'reviews' => $listReviews,
             'total_reviews' => count($listReviews)
         ]);
     }
 
-    public function showReviewsByCalification($productId)
-    {
-        $listReviews = Review::where('product_id', $productId)
-            ->where('calification', '>', 4) 
-            ->select('id', 'product_id', 'comment', 'calification')
-            ->get();
-    
-        return response()->json([
-            'reviews' => $listReviews,
-            'total_reviews' => count($listReviews)
-        ]);
-    }
-    
-    
+
     public function deleteReview($review_id)
     {
         $user_id = auth()->id();
