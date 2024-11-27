@@ -22,19 +22,21 @@ class RecommendationController extends Controller
     public function getRecommendationByCart(Request $request)
     {
         $userId = $request->user()->id;
-    
-        // Llamamos al método en CartProducts para obtener los IDs de productos en el carrito
-        $cartProducts = cart_products::getUserCartProductIds($userId);
-    
-        // Llamamos al método en Product para obtener las categorías de los productos en el carrito
-        $categories = Product::getCategoriesByProductIds($cartProducts);
-    
-        // Llamamos al método en Product para obtener los productos recomendados
-        $recommendedProducts = Product::getRecommendedProducts($categories, $cartProducts);
-    
-        return response()->json($recommendedProducts, 200);
+
+        $cartProducts = cart_products::where('user_id', $userId)->pluck('product_id');
+
+        $categories = Product::whereIn('product_id', $cartProducts)->pluck('category_id')->unique();
+
+    // Obtener productos recomendados en las mismas categorías pero que no están en el carrito
+        $recommendedProducts = Product::whereIn('category_id', $categories)
+        ->whereNotIn('product_id', $cartProducts)
+            ->with('images') // Supongamos que los productos tienen imágenes relacionadas
+            ->get();
+
+    return response()->json($recommendedProducts, 200);
     }
-    
+
+
     public function getRecommendationByDiscount(Request $request)
     {
         // Consultar productos con descuento mayor a 0 e incluir las imágenes relacionadas
@@ -54,31 +56,43 @@ public function getRecommendationByHistory($categoryId)
 {
     // $user =  ;// Obtiene el usuario autenticado
     $user =  Auth::user();// Obtiene el usuario autenticado
-    $user = User::find(10); // O el ID del usuario que quieras
+    // $user = User::find(10); // O el ID del usuario que quieras
 
     // Obtener los productos comprados en la categoría especificada
     $purchasedProducts = $user->getPurchasedProductsInCategory($categoryId);
 
     // Obtener todos los productos en la categoría especificada
-    $allProductsInCategory = Product::getAllProductsInCategory($categoryId);
+    $allProductsInCategory = Product::with('images')->where('category_id', $categoryId)->get();
 
     $combinedProducts = $purchasedProducts->concat($allProductsInCategory)
     ->unique('product_id')
     ->values();
+ // Mapear los productos para incluir el image_path
+ $result = $combinedProducts->map(function ($product) {
+    $imagePath = $product->images->isNotEmpty() ? $product->images->first()->image_path : null;
 
-    // Mapear los productos para incluir el image_path
-    $result = $combinedProducts->map(function ($product) {
-        return [
-            'product_id' => $product->product_id, // Ajusta según el nombre de tu ID
-            'name' => $product->name, // Ajusta si necesitas más atributos
-            'price' => $product->price, // Asegúrate de que 'price' esté en tu modelo
-            'discount' => $product->discount, // Asegúrate de que 'discount' esté en tu modelo
-            'description' => $product->description, // Asegúrate de que 'description' esté en tu modelo
-            'image_path' => $product->images->isNotEmpty() ? $product->images->first()->image_path : null, // Asegúrate de que no esté vacío
-        ];
-    });
+    // Manejar ambos tipos de imagen
+    if ($imagePath) {
+        if (filter_var($imagePath, FILTER_VALIDATE_URL)) {
+            $finalImagePath = $imagePath; // Es un enlace completo
+        } else {
+            $finalImagePath = asset('storage/' . $imagePath); // Es una ruta relativa
+        }
+    } else {
+        $finalImagePath = asset('images/default-product.png'); // Imagen predeterminada
+    }
 
-    return response()->json($result);
+    return [
+        'product_id' => $product->product_id, // Ajusta según el nombre de tu ID
+        'name' => $product->name, // Ajusta si necesitas más atributos
+        'price' => $product->price, // Asegúrate de que 'price' esté en tu modelo
+        'discount' => $product->discount, // Asegúrate de que 'discount' esté en tu modelo
+        'description' => $product->description, // Asegúrate de que 'description' esté en tu modelo
+        'image_path' => $finalImagePath, // Asigna la imagen procesada
+    ];
+});
+
+return response()->json($result);
 }
 
 

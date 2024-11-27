@@ -75,6 +75,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::put('/order-return/{id}', [OrderReturnController::class, 'update'])->name('orderReturn.update');
     Route::delete('/order-return/{id}', [OrderReturnController::class, 'destroy'])->name('orderReturn.destroy');
     Route::get('/order-returns', [OrderReturnController::class, 'getAllReturns'])->name('orderReturn.getAll');
+    Route::get('/order-returns/user/{userId}', [OrderReturnController::class, 'getReturnsByUser'])->name('orderReturn.getByUser');
 });
 
 Route::post('/payment/validate-card', [PaymentMethodController::class, 'validateCardNumber']);
@@ -104,7 +105,7 @@ Route::get('/tickets/{id}', [TicketController::class, 'show']);
 
 
 // middleware(['auth:sanctum'])->
-Route::get('/recommended/products/category/{categoryId}', [RecommendationController::class, 'getRecommendationByHistory']);
+Route::middleware('auth:sanctum')->get('/recommended/products/category/{categoryId}', [RecommendationController::class, 'getRecommendationByHistory']);
 Route::get('/recommended/test/products/category/{categoryId}', [RecommendationController::class, 'testProductImages']);
 Route::get('/recommended/tending/products', [RecommendationController::class, 'getTendingProducts']);
 
@@ -182,3 +183,8 @@ Route::get('/store/{sellerId}', [StoreController::class, 'storesBySellerId']);
 Route::get('/store/id/{Id}', [StoreController::class, 'storesById']);
 Route::delete('/store/{id}', [StoreController::class, 'deleteStore']);
 Route::patch('/store/{id}', [StoreController::class, 'updateStore']);
+//apis de gestion de variantes
+Route::post('/products/{productId}/variation', [ProductController::class, 'createVariation']);
+Route::put('/products/{productId}/variation', [ProductController::class, 'updateVariation']);
+Route::delete('/products/{productId}/variation', [ProductController::class, 'deleteVariation']);
+Route::get('/products/{productId}/variation', [ProductController::class, 'getVariations']);

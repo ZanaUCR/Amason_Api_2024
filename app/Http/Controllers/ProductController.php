@@ -12,7 +12,6 @@ use Illuminate\Support\Facades\DB;
 
 class ProductController extends Controller
 {
-    // Obtener productos por tienda
     public function getProductsByStore($storeId)
     {
         $products = Product::where('id_store', $storeId)
@@ -32,7 +31,7 @@ class ProductController extends Controller
                     $product->image = asset('storage/' . $imagePath); // Generar la URL si no es completa
                 }
             } else {
-                $product->image = asset('default_image_path'); // Cambia 'default_image_path' a la ruta real de la imagen por defecto
+                $product->image = asset('images/default-product.png'); // Imagen predeterminada
             }
     
             $product->category_name = $product->category->name ?? 'Categoría desconocida'; // Añadir el nombre de la categoría
@@ -42,6 +41,7 @@ class ProductController extends Controller
     
         return response()->json($products, 200);
     }
+    
     
 
 // Agregar un nuevo producto
@@ -229,14 +229,15 @@ public function updateProductImages(Request $request, $id)
     {
         // Obtener todos los productos que pertenecen a la categoría especificada
         $products = Product::where('category_id', $categoryId)
-            ->with('images') // Obtener imágenes si las tienes relacionadas
+            ->with('images', 'category') // Obtener imágenes y categorías relacionadas
+            ->select('product_id', 'name', 'price', 'category_id', 'description', 'stock')
             ->get();
     
-        // Asignar la primera imagen con URL completa o una imagen por defecto
+        // Normalizar las imágenes y agregar detalles adicionales
         $products->each(function ($product) {
-            if ($product->images->first()) {
-                $imagePath = $product->images->first()->image_path;
+            $imagePath = $product->images->first()?->image_path;
     
+            if ($imagePath) {
                 // Verificar si el image_path ya es un enlace completo
                 if (filter_var($imagePath, FILTER_VALIDATE_URL)) {
                     $product->image = $imagePath; // Usar directamente si es una URL
@@ -244,10 +245,11 @@ public function updateProductImages(Request $request, $id)
                     $product->image = asset('storage/' . $imagePath); // Generar la URL si no es completa
                 }
             } else {
-                $product->image = asset('default_image_path'); // Cambia 'default_image_path' a la ruta real de la imagen por defecto
+                $product->image = asset('images/default-product.png'); // Imagen predeterminada
             }
     
-            unset($product->images); // Remover las imágenes del resultado
+            $product->category_name = $product->category->name ?? 'Categoría desconocida'; // Agregar el nombre de la categoría
+            unset($product->images, $product->category); // Remover detalles innecesarios
         });
     
         return response()->json($products, 200);
@@ -276,11 +278,19 @@ public function updateProductImages(Request $request, $id)
         ->select('product_id', 'name', 'price', 'category_id', 'description', 'stock')
         ->get();
 
-    // Formatear los resultados (incluir imágenes)
+    // Normalizar las imágenes y agregar detalles adicionales
     $products->each(function ($product) {
-        $product->image = $product->images->first() 
-            ? asset('storage/' . $product->images->first()->image_path)
-            : asset('default_image_path');
+        $imagePath = $product->images->first()?->image_path;
+
+        if ($imagePath) {
+            if (filter_var($imagePath, FILTER_VALIDATE_URL)) {
+                $product->image = $imagePath;
+            } else {
+                $product->image = asset('storage/' . $imagePath);
+            }
+        } else {
+            $product->image = asset('default_image_path');
+        }
 
         $product->category_name = $product->category->name ?? 'Categoría desconocida';
         unset($product->images, $product->category);
@@ -289,6 +299,183 @@ public function updateProductImages(Request $request, $id)
     return response()->json($products, 200);
 }
 
+
+
+public function createVariation(Request $request, $productId)
+{
+    // Validar los datos de entrada
+    $validator = Validator::make($request->all(), [
+        'type' => 'required|string|max:255',
+        'options' => 'required|array|min:1',
+        'options.*' => 'string|max:255',
+    ], [
+        'type.required' => 'El tipo de variación es obligatorio.',
+        'options.required' => 'Debe proporcionar al menos una opción para la variación.',
+        'options.array' => 'Las opciones deben enviarse como un arreglo.',
+    ]);
+
+    // Manejar errores de validación
+    if ($validator->fails()) {
+        return response()->json(['errors' => $validator->errors()], 400);
+    }
+
+    try {
+        // Encontrar el producto por ID
+        $product = Product::findOrFail($productId);
+
+        // Decodificar las variaciones existentes o inicializar un arreglo vacío
+        $variation = json_decode($product->variation, true) ?? [];
+
+        // Agregar la nueva variación
+        $variation[] = [
+            'type' => $request->type,
+            'options' => $request->options,
+        ];
+
+        // Actualizar el campo de variaciones en formato JSON
+        $product->variation = json_encode($variation, JSON_UNESCAPED_UNICODE);
+        $product->save();
+
+        return response()->json([
+            'message' => 'Variación agregada con éxito',
+            'product' => $product,
+            'variation' => $variation,
+        ], 200);
+    } catch (\Exception $e) {
+        return response()->json([
+            'error' => 'Error al agregar la variación',
+            'details' => $e->getMessage(),
+        ], 500);
+    }
+}
+
+
+public function updateVariation(Request $request, $productId)
+{
+    // Validar los datos de entrada
+    $validator = Validator::make($request->all(), [
+        'type' => 'required|string|max:255',
+        'options' => 'required|array|min:1',
+        'options.*' => 'string|max:255',
+    ], [
+        'type.required' => 'El tipo de variación es obligatorio.',
+        'options.required' => 'Debe proporcionar al menos una opción para la variación.',
+        'options.array' => 'Las opciones deben enviarse como un arreglo.',
+    ]);
+
+    // Manejar errores de validación
+    if ($validator->fails()) {
+        return response()->json(['errors' => $validator->errors()], 400);
+    }
+
+    try {
+        // Encontrar el producto por ID
+        $product = Product::findOrFail($productId);
+
+        // Decodificar las variaciones existentes
+        $variations = json_decode($product->variation, true) ?? [];
+
+        // Buscar la variación por su tipo
+        $found = false;
+        foreach ($variations as &$variation) {
+            if ($variation['type'] === $request->type) {
+                // Actualizar las opciones de la variación encontrada
+                $variation['options'] = $request->options;
+                $found = true;
+                break;
+            }
+        }
+
+        if (!$found) {
+            return response()->json([
+                'error' => 'No se encontró una variación con el tipo especificado.',
+            ], 404);
+        }
+
+        // Guardar las variaciones actualizadas
+        $product->variation = json_encode($variations, JSON_UNESCAPED_UNICODE);
+        $product->save();
+
+        return response()->json([
+            'message' => 'Variación actualizada con éxito',
+            'product' => $product,
+            'variation' => $variations,
+        ], 200);
+    } catch (\Exception $e) {
+        return response()->json([
+            'error' => 'Error al actualizar la variación',
+            'details' => $e->getMessage(),
+        ], 500);
+    }
+}
+
+public function deleteVariation(Request $request, $productId)
+{
+    // Validar los datos de entrada
+    $validator = Validator::make($request->all(), [
+        'type' => 'required|string|max:255',
+    ], [
+        'type.required' => 'El tipo de variación es obligatorio.',
+    ]);
+
+    // Manejar errores de validación
+    if ($validator->fails()) {
+        return response()->json(['errors' => $validator->errors()], 400);
+    }
+
+    try {
+        // Encontrar el producto por ID
+        $product = Product::findOrFail($productId);
+
+        // Decodificar las variaciones existentes
+        $variations = json_decode($product->variation, true) ?? [];
+
+        // Filtrar las variaciones para eliminar la que coincide con el tipo
+        $updatedVariations = array_filter($variations, function ($variation) use ($request) {
+            return $variation['type'] !== $request->type;
+        });
+
+        // Verificar si se eliminó alguna variación
+        if (count($variations) === count($updatedVariations)) {
+            return response()->json([
+                'error' => 'No se encontró una variación con el tipo especificado.',
+            ], 404);
+        }
+
+        // Guardar las variaciones actualizadas
+        $product->variation = json_encode(array_values($updatedVariations), JSON_UNESCAPED_UNICODE);
+        $product->save();
+
+        return response()->json([
+            'message' => 'Variación eliminada con éxito',
+            'product' => $product,
+            'variations' => $updatedVariations,
+        ], 200);
+    } catch (\Exception $e) {
+        return response()->json([
+            'error' => 'Error al eliminar la variación',
+            'details' => $e->getMessage(),
+        ], 500);
+    }
+}
+
+public function getVariations($productId)
+{
+    try {
+        // Encontrar el producto por ID
+        $product = Product::findOrFail($productId);
+
+        // Decodificar las variaciones existentes
+        $variations = json_decode($product->variation, true) ?? [];
+
+        return response()->json($variations, 200);
+    } catch (\Exception $e) {
+        return response()->json([
+            'error' => 'Error al obtener las variaciones',
+            'details' => $e->getMessage(),
+        ], 500);
+    }
+}
 
 
 

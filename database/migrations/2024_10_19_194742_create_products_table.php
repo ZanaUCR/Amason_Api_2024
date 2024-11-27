@@ -20,6 +20,7 @@ return new class extends Migration
             $table->text('description');
             $table->double('price');
             $table->integer('stock');
+            $table->string('variation')->nullable();
             $table->integer('discount')->default(0);
             $table->timestamps();
         });
@@ -33,3 +34,4 @@ return new class extends Migration
         Schema::dropIfExists('products');
     }
 };
+
