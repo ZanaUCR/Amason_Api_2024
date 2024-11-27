@@ -22,19 +22,21 @@ class RecommendationController extends Controller
     public function getRecommendationByCart(Request $request)
     {
         $userId = $request->user()->id;
-    
-        // Llamamos al método en CartProducts para obtener los IDs de productos en el carrito
-        $cartProducts = cart_products::getUserCartProductIds($userId);
-    
-        // Llamamos al método en Product para obtener las categorías de los productos en el carrito
-        $categories = Product::getCategoriesByProductIds($cartProducts);
-    
-        // Llamamos al método en Product para obtener los productos recomendados
-        $recommendedProducts = Product::getRecommendedProducts($categories, $cartProducts);
-    
-        return response()->json($recommendedProducts, 200);
+
+        $cartProducts = cart_products::where('user_id', $userId)->pluck('product_id');
+
+        $categories = Product::whereIn('product_id', $cartProducts)->pluck('category_id')->unique();
+
+    // Obtener productos recomendados en las mismas categorías pero que no están en el carrito
+        $recommendedProducts = Product::whereIn('category_id', $categories)
+        ->whereNotIn('product_id', $cartProducts)
+            ->with('images') // Supongamos que los productos tienen imágenes relacionadas
+            ->get();
+
+    return response()->json($recommendedProducts, 200);
     }
-    
+
+
     public function getRecommendationByDiscount(Request $request)
     {
         // Consultar productos con descuento mayor a 0 e incluir las imágenes relacionadas
