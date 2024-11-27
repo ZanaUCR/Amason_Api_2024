@@ -62,7 +62,7 @@ public function getRecommendationByHistory($categoryId)
     $purchasedProducts = $user->getPurchasedProductsInCategory($categoryId);
 
     // Obtener todos los productos en la categoría especificada
-    $allProductsInCategory = Product::getAllProductsInCategory($categoryId);
+    $allProductsInCategory = Product::with('images')->where('category_id', $categoryId)->get();
 
     $combinedProducts = $purchasedProducts->concat($allProductsInCategory)
     ->unique('product_id')
