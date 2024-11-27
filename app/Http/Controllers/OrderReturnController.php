@@ -73,7 +73,7 @@ class OrderReturnController extends Controller
                 'status' => 'success',
                 'message' => 'Solicitud de devolución creada.',
                 'return' => $return
-            ], 201);x   
+            ], 201);
         } catch (\Exception $e) {
             return response()->json([
                 'status' => 'error',
