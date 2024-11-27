@@ -41,10 +41,13 @@ class OrderController extends Controller
         $deliveryInfo = $deliveryInfoResponse->getData();
 
         $orderInProgress = $this->searchPendingOrderByUser();
+        // Finalizar la orden usando el método finishOrder
         $finishOrderRequest = new Request([
             'order_id' => $orderInProgress->order_id,
-            'payment_method_id' => $paymentMethodId,
+            'payment_method_id' => $request->input('payment_method_id')
         ]);
+
+        return $this->finishOrder($finishOrderRequest);
     }
 
 
@@ -73,6 +76,7 @@ class OrderController extends Controller
             'user_id' => $validated['user_id'],
             'status' => 1, // Estado inicial como en proceso
             'total_amount' => $totalAmount,
+            'payment_method_id'=> 1,
         ]);
 
         $order->save();
@@ -90,13 +94,7 @@ class OrderController extends Controller
             $orderItem->save();
         }
 
-        // Finalizar la orden usando el método finishOrder
-        $finishOrderRequest = new Request([
-            'order_id' => $order->order_id,
-            'payment_method_id' => $request->input('payment_method_id')
-        ]);
-
-        return $this->finishOrder($finishOrderRequest);
+        
     }
     
 
