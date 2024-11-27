@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('order_returns', function (Blueprint $table) {
             $table->id();
-            $table->date('date')->unique();
+            $table->date('date');
             $table->date('return_date')->nullable();
             $table->enum('status', ['pending', 'approved', 'rejected', 'completed']);
             $table->text('reason');

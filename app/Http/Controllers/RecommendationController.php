@@ -54,7 +54,7 @@ public function getRecommendationByHistory($categoryId)
 {
     // $user =  ;// Obtiene el usuario autenticado
     $user =  Auth::user();// Obtiene el usuario autenticado
-    $user = User::find(10); // O el ID del usuario que quieras
+    // $user = User::find(10); // O el ID del usuario que quieras
 
     // Obtener los productos comprados en la categoría especificada
     $purchasedProducts = $user->getPurchasedProductsInCategory($categoryId);

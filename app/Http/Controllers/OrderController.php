@@ -52,12 +52,10 @@ class OrderController extends Controller
 
     public function createOrder(Request $request)
     {
-
         $validated = $request->validate([
             'user_id' => 'required|exists:users,id',
             'status' => 'required|integer' // 1 proceso 2 finalizado 3 cancelado
         ]);
-
 
         $cartProducts = $this->searchProductInCartByuser_id();
 
@@ -71,19 +69,16 @@ class OrderController extends Controller
             $totalAmount += $product->price * $cartProduct->quantity;
         }
 
-        $order = new Order(
-            [
-                'user_id' => $validated['user_id'],
-                'status' => $validated['status'],
-                'total_amount' => $totalAmount,
-            ]
-        );
+        $order = new Order([
+            'user_id' => $validated['user_id'],
+            'status' => 1, // Estado inicial como en proceso
+            'total_amount' => $totalAmount,
+        ]);
 
         $order->save();
 
         foreach ($cartProducts as $cartProduct) {
             $product = $this->searchProduct($cartProduct->product_id);
-
 
             $orderItem = new OrderItem([
                 'product_id' => $product->product_id,
@@ -93,11 +88,15 @@ class OrderController extends Controller
             ]);
 
             $orderItem->save();
-            //$cartProduct->delete();
         }
 
-        return
-         response()->json(['status' => 'success', 'order_id' => $order->order_id, 'total_amount' => $totalAmount]);
+        // Finalizar la orden usando el método finishOrder
+        $finishOrderRequest = new Request([
+            'order_id' => $order->order_id,
+            'payment_method_id' => $request->input('payment_method_id')
+        ]);
+
+        return $this->finishOrder($finishOrderRequest);
     }
     
 
