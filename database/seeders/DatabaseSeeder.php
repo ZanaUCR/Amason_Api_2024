@@ -17,6 +17,7 @@ use Database\Factories\ProductFactory;
 use Database\Factories\PaymentMethodFactory;
 use Database\Sedder\ProductImageSeeder;
 
+
 class DatabaseSeeder extends Seeder
 {
     /**
@@ -76,9 +77,5 @@ class DatabaseSeeder extends Seeder
         }
     }
     
-    
-    
-    
-    
-    
 }
+    
