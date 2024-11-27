@@ -13,8 +13,11 @@ class product extends Model
 
 
     // Agrega los atributos que se pueden llenar de forma masiva
-    protected $fillable = ['name', 'description', 'price', 'stock','discount', 'category_id', 'id_store'];
-  
+
+    protected $fillable = ['name', 'description', 'price', 'stock', 'discount', 'category_id', 'id_store', 'variation'];
+
+   
+
     // Relación con la categoría
     public function category()
     {
