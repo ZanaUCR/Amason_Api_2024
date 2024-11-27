@@ -77,6 +77,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::put('/order-return/{id}', [OrderReturnController::class, 'update'])->name('orderReturn.update');
     Route::delete('/order-return/{id}', [OrderReturnController::class, 'destroy'])->name('orderReturn.destroy');
     Route::get('/order-returns', [OrderReturnController::class, 'getAllReturns'])->name('orderReturn.getAll');
+    Route::get('/order-returns/user/{userId}', [OrderReturnController::class, 'getReturnsByUser'])->name('orderReturn.getByUser');
 });
 
 Route::post('/payment/validate-card', [PaymentMethodController::class, 'validateCardNumber']);

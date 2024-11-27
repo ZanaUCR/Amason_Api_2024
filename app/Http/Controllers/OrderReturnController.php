@@ -73,7 +73,7 @@ class OrderReturnController extends Controller
                 'status' => 'success',
                 'message' => 'Solicitud de devolución creada.',
                 'return' => $return
-            ], 201);
+            ], 201);x   
         } catch (\Exception $e) {
             return response()->json([
                 'status' => 'error',
@@ -104,11 +104,17 @@ class OrderReturnController extends Controller
     public function destroy($id)
     {
         $return = OrderReturn::findOrFail($id);
+        $order = $return->order;
         $return->delete();
+
+        if ($order) {
+            $order->status = 2; // Cambiar el estado de la orden a "finalizado"
+            $order->save();
+        }
 
         return response()->json([
             'status' => 'success',
-            'message' => 'Devolución eliminada.'
+            'message' => 'Devolución eliminada y estado de la orden actualizado.'
         ]);
     }
 
@@ -128,4 +134,11 @@ public function getAllReturns()
         ], 500);
     }
 }
+
+public function getReturnsByUser($userId)
+{
+    $returns = OrderReturn::where('user_id', $userId)->get();
+    return response()->json($returns);
+}
+
 }
