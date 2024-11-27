@@ -13,8 +13,11 @@ class product extends Model
 
 
     // Agrega los atributos que se pueden llenar de forma masiva
-    protected $fillable = ['name', 'description', 'price', 'stock','discount', 'category_id', 'id_store'];
-  
+
+    protected $fillable = ['name', 'description', 'price', 'stock', 'discount', 'category_id', 'id_store', 'variation'];
+
+   
+
     // Relación con la categoría
     public function category()
     {
@@ -41,26 +44,5 @@ class product extends Model
     {
         return $this->hasMany(ProductImage::class, 'product_id');
     }
-
-    public static function getAllProductsInCategory($categoryId)
-    {
-        return self::with('images')->where('category_id', $categoryId)->get();
-    }
-    
-    
-    public static function getCategoriesByProductIds($productIds)
-    {
-        return self::whereIn('product_id', $productIds)->pluck('category_id')->unique();
-    }
-
-    public static function getRecommendedProducts($categoryIds, $productIds)
-    {
-        return self::whereIn('category_id', $categoryIds)
-                ->whereNotIn('product_id', $productIds)
-                ->with('images') // Carga las imágenes relacionadas
-                ->get();
-    }
-
-
 
 }

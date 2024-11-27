@@ -77,6 +77,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::put('/order-return/{id}', [OrderReturnController::class, 'update'])->name('orderReturn.update');
     Route::delete('/order-return/{id}', [OrderReturnController::class, 'destroy'])->name('orderReturn.destroy');
     Route::get('/order-returns', [OrderReturnController::class, 'getAllReturns'])->name('orderReturn.getAll');
+    Route::get('/order-returns/user/{userId}', [OrderReturnController::class, 'getReturnsByUser'])->name('orderReturn.getByUser');
 });
 
 Route::post('/payment/validate-card', [PaymentMethodController::class, 'validateCardNumber']);
@@ -184,4 +185,8 @@ Route::get('/store/id/{Id}', [StoreController::class, 'storesById']);
 Route::delete('/store/{id}', [StoreController::class, 'deleteStore']);
 Route::patch('/store/{id}', [StoreController::class, 'updateStore']);
 
-
+//apis de gestion de variantes
+Route::post('/products/{productId}/variation', [ProductController::class, 'createVariation']);
+Route::put('/products/{productId}/variation', [ProductController::class, 'updateVariation']);
+Route::delete('/products/{productId}/variation', [ProductController::class, 'deleteVariation']);
+Route::get('/products/{productId}/variation', [ProductController::class, 'getVariations']);
