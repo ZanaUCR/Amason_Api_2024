@@ -20,7 +20,7 @@ class TicketController extends Controller
         }
         
         $request->validate([
-            'order_package' => 'required|string',
+            'order_package' => 'string',
             'claim_type' => 'required|string',
             'subject' => 'required|string',
             'description' => 'required|string',

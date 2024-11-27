@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->date('date');
             $table->date('return_date')->nullable();
-            $table->enum('status', ['pending', 'approved', 'rejected', 'completed']);
+            $table->enum('status', ['pendiente', 'aprobado', 'rechazado', 'completado']);
             $table->text('reason');
             $table->text('admin_notes')->nullable();
             $table->foreignId('order_id')->constrained('orders', 'order_id');

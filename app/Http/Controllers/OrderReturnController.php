@@ -61,7 +61,7 @@ class OrderReturnController extends Controller
             $return = OrderReturn::create([
                 'order_id' => $order->order_id,
                 'user_id' => auth()->user()->id,
-                'status' => 'pending',
+                'status' => 'pendiente',
                 'reason' => $validated['reason'],
                 'date' => now()
             ]);
@@ -84,7 +84,7 @@ class OrderReturnController extends Controller
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-            'status' => 'required|in:approved,rejected,completed',
+            'status' => 'required|in:aprobado,rechazado,completado',
             'admin_notes' => 'nullable|string'
         ]);
 
