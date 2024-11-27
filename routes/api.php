@@ -112,7 +112,8 @@ Route::get('/recommended/test/products/category/{categoryId}', [RecommendationCo
 Route::get('/recommended/tending/products', [RecommendationController::class, 'getTendingProducts']);
 
 
-//Route::get('stores/{storeId}/top-selling-products', [ReportController::class, 'getTopSellingProductsByStore']);
+Route::get('stores/{storeId}/top-selling-products', [ReportController::class, 'getTopSellingProductsByStore']);
+Route::get('stores/{storeId}/top-selling-products-pdf', [ReportController::class, 'exportTopSellingProductsPdf']);
 
 
 Route::middleware('auth:sanctum')->group(function () {
