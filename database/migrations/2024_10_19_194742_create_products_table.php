@@ -21,6 +21,7 @@ return new class extends Migration
             $table->double('price');
             $table->integer('stock');
             $table->string('variation')->nullable();
+            $table->integer('discount')->default(0);
             $table->timestamps();
         });
     }

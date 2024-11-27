@@ -14,86 +14,93 @@ class OrderController extends Controller
     protected $paymentMethodController;
 
     public function __construct(CartProductsController $cartProductsController, PaymentMethodController $paymentMethodController)
-{
-    $this->cartProductsController = $cartProductsController;
-    $this->paymentMethodController = $paymentMethodController;
-}
+    {
+        $this->cartProductsController = $cartProductsController;
+        $this->paymentMethodController = $paymentMethodController;
+    }
 
     // processOrder()
     // validatePaymentMethod()
     // finishOrder()
     public function processOrder(Request $request)
-{
+    {
     $paymentMethod = $request->input('paymentMethod');
     $paymentMethodId = $paymentMethod === 'card' ? 1 : ($paymentMethod === 'paypal' ? 2 : null);
 
     if ($paymentMethod === 'card' && !$this->validateCardNumber($request->input('cardNumber', null))) {
-        return response()->json(['status' => 'failed', 'message' => 'Invalid card number.'], 400);
+        return response()->json(['status' => 'failed', 'message' => 'Numero de tarjeta inválido.'], 400);
     }
 
-    $orderInProgress = $this->searchPendingOrderByUser();
-    $finishOrderRequest = new Request([
-        'order_id' => $orderInProgress->order_id,
-        'payment_method_id' => $paymentMethodId,
-    ]);
-    $deliveryInfoRequest = new Request();
-    $deliveryInfoResponse = app(UserController::class)->getDeliveryInformation($deliveryInfoRequest);
-    $deliveryInfo = $deliveryInfoResponse->getData();
+
+        if ($paymentMethod === 'card' && !$this->validateCardNumber($request->input('cardNumber', null))) {
+            return response()->json(['status' => 'failed', 'message' => 'Invalid card number.'], 400);
+        }
+
+        $deliveryInfoRequest = new Request();
+        $deliveryInfoResponse = app(UserController::class)->getDeliveryInformation($deliveryInfoRequest);
+        $deliveryInfo = $deliveryInfoResponse->getData();
+
+        $orderInProgress = $this->searchPendingOrderByUser();
+        $finishOrderRequest = new Request([
+            'order_id' => $orderInProgress->order_id,
+            'payment_method_id' => $paymentMethodId,
+        ]);
+    }
 
 
-    return $this->finishOrder($finishOrderRequest);
-}
 
 
     public function createOrder(Request $request)
-{
-    
-    $validated = $request->validate([
-        'user_id' => 'required|exists:users,id',
-        'status' => 'required|integer' // 1 proceso 2 finalizado 3 cancelado 4 devuelto
-    ]);
+    {
+        $validated = $request->validate([
+            'user_id' => 'required|exists:users,id',
+            'status' => 'required|integer' // 1 proceso 2 finalizado 3 cancelado
+        ]);
 
+        $cartProducts = $this->searchProductInCartByuser_id();
 
-    $cartProducts = $this->searchProductInCartByuser_id();
-   
-    if ($cartProducts->isEmpty()) {
-        return response()->json(['status' => 'failed', 'message' => 'No products in the cart.'], 400);
-    }
+        if ($cartProducts->isEmpty()) {
+            return response()->json(['status' => 'failed', 'message' => 'No products in the cart.'], 400);
+        }
 
-    $totalAmount = 0;
-    foreach ($cartProducts as $cartProduct) {
-        $product = $this->searchProduct($cartProduct->product_id);
-        $totalAmount += $product->price * $cartProduct->quantity;
-    }
+        $totalAmount = 0;
+        foreach ($cartProducts as $cartProduct) {
+            $product = $this->searchProduct($cartProduct->product_id);
+            $totalAmount += $product->price * $cartProduct->quantity;
+        }
 
-    $order = new Order(
-        [
+        $order = new Order([
             'user_id' => $validated['user_id'],
-            'status' => $validated['status'],
+            'status' => 1, // Estado inicial como en proceso
             'total_amount' => $totalAmount,
         ]);
 
-    $order->save();
+        $order->save();
 
-    foreach ($cartProducts as $cartProduct) {
-        $product = $this->searchProduct($cartProduct->product_id);
+        foreach ($cartProducts as $cartProduct) {
+            $product = $this->searchProduct($cartProduct->product_id);
 
+            $orderItem = new OrderItem([
+                'product_id' => $product->product_id,
+                'order_id' => $order->order_id,
+                'quantity' => $cartProduct->quantity,
+                'price_at_purchase' => $product->price
+            ]);
 
-        $orderItem = new OrderItem([
-            'product_id' => $product->product_id,
+            $orderItem->save();
+        }
+
+        // Finalizar la orden usando el método finishOrder
+        $finishOrderRequest = new Request([
             'order_id' => $order->order_id,
-            'quantity' => $cartProduct->quantity,
-            'price_at_purchase' => $product->price
+            'payment_method_id' => $request->input('payment_method_id')
         ]);
 
-        $orderItem->save();
-        //$cartProduct->delete();
+        return $this->finishOrder($finishOrderRequest);
     }
-
-    return response()->json(['status' => 'success', 'order_id' => $order->order_id, 'total_amount' => $totalAmount]);
-}
-
     
+
+
     public function searchProduct($product_id)
     {
         $product = Product::where('product_id', $product_id)->firstOrFail();
@@ -101,16 +108,16 @@ class OrderController extends Controller
     }
 
     public function searchProductInCartByuser_id()
-{
-    return $this->cartProductsController->searchProductInCartByuser_id();
-}
+    {
+        return $this->cartProductsController->searchProductInCartByuser_id();
+    }
 
 
     public function validateCardNumber($cardNumber)
-{
-    $paymentMethodRequest = new Request(['cardNumber' => $cardNumber]);
-    return $this->paymentMethodController->validateCardNumber($paymentMethodRequest); 
-}
+    {
+        $paymentMethodRequest = new Request(['cardNumber' => $cardNumber]);
+        return $this->paymentMethodController->validateCardNumber($paymentMethodRequest);
+    }
 
 
     public function finishOrder(Request $request)
@@ -167,6 +174,13 @@ class OrderController extends Controller
         // $order = Order::where('user_id', 1)->where('order_id', $order_id)->first();
         return $order;
     }
+
+    public function getAllOrdersByUser()
+    {
+        $orders = Order::where('user_id', auth()->user()->id)->get();
+        return $orders;
+    }
+
 
     public function searchPendingOrderByUser()
     {
