@@ -16,6 +16,7 @@ use App\Http\Controllers\PaymentMethodController;
 use App\Http\Controllers\StoreController;
 use App\Http\Controllers\RecommendationController;
 use App\Http\Controllers\UserController;
+use Illuminate\Support\Facades\Auth;
 
 
 
@@ -39,7 +40,6 @@ Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
 // Ruta de prueba para verificar si el servidor está en funcionamiento
 Route::get('/', function () {
     return response()->json(['message' => 'Hello World!']);
-
 });
 
 Route::post('/register', [AuthController::class, 'register']);
@@ -62,8 +62,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/cart/products', [OrderController::class, 'searchProductInCartByuser_id']);
     Route::get('/order/pending', [OrderController::class, 'searchPendingOrderByUser']);
     Route::get('/orders/user-history', [OrderController::class, 'getAllOrdersByUser']);
-    
-
 });
 
 // Ruta para pruebas
@@ -129,8 +127,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::middleware(['auth:sanctum'])->get('/products/category/{categoryId}', [RecommendationController::class, 'getCombinedProductsInCategory']);
 
     Route::middleware('auth:sanctum')->get('/recommendationByCart', [RecommendationController::class, 'getRecommendationByCart']);
-    
-
 });
 
 Route::get('/recommendationByDiscount', [RecommendationController::class, 'getRecommendationByDiscount']);
@@ -164,13 +160,17 @@ Route::get('/products/category/{categoryId}', [ProductController::class, 'getPro
 Route::post('/products', [ProductController::class, 'store']);
 
 //rutas para reviews
+
+Route::post('/reviews/publishReview/', [ReviewController::class, 'publishReview']);
+Route::get('/reviews/showReviews/{product_id}', [ReviewController::class, 'showReviews']);
+/*
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/reviews/publishReview/{product_id}', [ReviewController::class, 'publishReview']);
     Route::put('/reviews/updateReview/{review_id}', [ReviewController::class, 'updateReview']);
     Route::delete('/reviews/deleteReview/{review_id}', [ReviewController::class, 'deleteReview']);
     Route::get('/reviews/showReviews/{product_id}', [ReviewController::class, 'showReviews']);
     Route::get('/reviews/by-calification/{productId}', [ReviewController::class, 'showReviewsByCalification']);
-});
+});*/
 
 Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
     return response()->json(['user' => Auth::id()]);
@@ -182,5 +182,3 @@ Route::get('/store/{sellerId}', [StoreController::class, 'storesBySellerId']);
 Route::get('/store/id/{Id}', [StoreController::class, 'storesById']);
 Route::delete('/store/{id}', [StoreController::class, 'deleteStore']);
 Route::patch('/store/{id}', [StoreController::class, 'updateStore']);
-
-
