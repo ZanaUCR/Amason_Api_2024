@@ -36,10 +36,4 @@ class cart_products extends Model
         return $this->belongsTo(Product::class, 'product_id', 'id');
     }
 
-    // En CartProducts.php (modelo)
-    public static function getUserCartProductIds($userId)
-    {
-        return self::where('user_id', $userId)->pluck('product_id');
-    }
-
 }
