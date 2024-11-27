@@ -12,7 +12,6 @@ use Illuminate\Support\Facades\DB;
 
 class ProductController extends Controller
 {
-    // Obtener productos por tienda
     public function getProductsByStore($storeId)
     {
         $products = Product::where('id_store', $storeId)
@@ -32,7 +31,7 @@ class ProductController extends Controller
                     $product->image = asset('storage/' . $imagePath); // Generar la URL si no es completa
                 }
             } else {
-                $product->image = asset('default_image_path'); // Cambia 'default_image_path' a la ruta real de la imagen por defecto
+                $product->image = asset('images/default-product.png'); // Imagen predeterminada
             }
     
             $product->category_name = $product->category->name ?? 'Categoría desconocida'; // Añadir el nombre de la categoría
@@ -42,6 +41,7 @@ class ProductController extends Controller
     
         return response()->json($products, 200);
     }
+    
     
 
 // Agregar un nuevo producto
@@ -229,14 +229,15 @@ public function updateProductImages(Request $request, $id)
     {
         // Obtener todos los productos que pertenecen a la categoría especificada
         $products = Product::where('category_id', $categoryId)
-            ->with('images') // Obtener imágenes si las tienes relacionadas
+            ->with('images', 'category') // Obtener imágenes y categorías relacionadas
+            ->select('product_id', 'name', 'price', 'category_id', 'description', 'stock')
             ->get();
     
-        // Asignar la primera imagen con URL completa o una imagen por defecto
+        // Normalizar las imágenes y agregar detalles adicionales
         $products->each(function ($product) {
-            if ($product->images->first()) {
-                $imagePath = $product->images->first()->image_path;
+            $imagePath = $product->images->first()?->image_path;
     
+            if ($imagePath) {
                 // Verificar si el image_path ya es un enlace completo
                 if (filter_var($imagePath, FILTER_VALIDATE_URL)) {
                     $product->image = $imagePath; // Usar directamente si es una URL
@@ -244,10 +245,11 @@ public function updateProductImages(Request $request, $id)
                     $product->image = asset('storage/' . $imagePath); // Generar la URL si no es completa
                 }
             } else {
-                $product->image = asset('default_image_path'); // Cambia 'default_image_path' a la ruta real de la imagen por defecto
+                $product->image = asset('images/default-product.png'); // Imagen predeterminada
             }
     
-            unset($product->images); // Remover las imágenes del resultado
+            $product->category_name = $product->category->name ?? 'Categoría desconocida'; // Agregar el nombre de la categoría
+            unset($product->images, $product->category); // Remover detalles innecesarios
         });
     
         return response()->json($products, 200);
@@ -276,11 +278,19 @@ public function updateProductImages(Request $request, $id)
         ->select('product_id', 'name', 'price', 'category_id', 'description', 'stock')
         ->get();
 
-    // Formatear los resultados (incluir imágenes)
+    // Normalizar las imágenes y agregar detalles adicionales
     $products->each(function ($product) {
-        $product->image = $product->images->first() 
-            ? asset('storage/' . $product->images->first()->image_path)
-            : asset('default_image_path');
+        $imagePath = $product->images->first()?->image_path;
+
+        if ($imagePath) {
+            if (filter_var($imagePath, FILTER_VALIDATE_URL)) {
+                $product->image = $imagePath;
+            } else {
+                $product->image = asset('storage/' . $imagePath);
+            }
+        } else {
+            $product->image = asset('default_image_path');
+        }
 
         $product->category_name = $product->category->name ?? 'Categoría desconocida';
         unset($product->images, $product->category);
@@ -288,9 +298,5 @@ public function updateProductImages(Request $request, $id)
 
     return response()->json($products, 200);
 }
-
-
-
-
 
 }

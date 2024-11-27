@@ -65,20 +65,32 @@ public function getRecommendationByHistory($categoryId)
     $combinedProducts = $purchasedProducts->concat($allProductsInCategory)
     ->unique('product_id')
     ->values();
+ // Mapear los productos para incluir el image_path
+ $result = $combinedProducts->map(function ($product) {
+    $imagePath = $product->images->isNotEmpty() ? $product->images->first()->image_path : null;
 
-    // Mapear los productos para incluir el image_path
-    $result = $combinedProducts->map(function ($product) {
-        return [
-            'product_id' => $product->product_id, // Ajusta según el nombre de tu ID
-            'name' => $product->name, // Ajusta si necesitas más atributos
-            'price' => $product->price, // Asegúrate de que 'price' esté en tu modelo
-            'discount' => $product->discount, // Asegúrate de que 'discount' esté en tu modelo
-            'description' => $product->description, // Asegúrate de que 'description' esté en tu modelo
-            'image_path' => $product->images->isNotEmpty() ? $product->images->first()->image_path : null, // Asegúrate de que no esté vacío
-        ];
-    });
+    // Manejar ambos tipos de imagen
+    if ($imagePath) {
+        if (filter_var($imagePath, FILTER_VALIDATE_URL)) {
+            $finalImagePath = $imagePath; // Es un enlace completo
+        } else {
+            $finalImagePath = asset('storage/' . $imagePath); // Es una ruta relativa
+        }
+    } else {
+        $finalImagePath = asset('images/default-product.png'); // Imagen predeterminada
+    }
 
-    return response()->json($result);
+    return [
+        'product_id' => $product->product_id, // Ajusta según el nombre de tu ID
+        'name' => $product->name, // Ajusta si necesitas más atributos
+        'price' => $product->price, // Asegúrate de que 'price' esté en tu modelo
+        'discount' => $product->discount, // Asegúrate de que 'discount' esté en tu modelo
+        'description' => $product->description, // Asegúrate de que 'description' esté en tu modelo
+        'image_path' => $finalImagePath, // Asigna la imagen procesada
+    ];
+});
+
+return response()->json($result);
 }
 
 
