@@ -114,6 +114,14 @@ Route::get('stores/{storeId}/top-selling-products', [ReportController::class, 'g
 Route::get('stores/{storeId}/top-selling-products-pdf', [ReportController::class, 'exportTopSellingProductsPdf']);
 
 
+Route::prefix('reports')->group(function () {
+    Route::get('top-selling-products/{storeId}', [ReportController::class, 'getTopSellingProductsByStore'])
+        ->name('reports.top-selling-products');
+
+    Route::get('export-pdf/{storeId}', [ReportController::class, 'exportTopSellingProductsPdf'])
+        ->name('reports.export-pdf');
+});
+
 Route::middleware('auth:sanctum')->group(function () {
 
     //Route::post('/tickets/{id}/assign', [TicketController::class, 'assignTicket']);
